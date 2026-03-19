@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function SignUp() {
@@ -16,20 +16,32 @@ export default function SignUp() {
         e.preventDefault();
         try {
             setLoading(true);
-            await createUserWithEmailAndPassword(auth, form.email,form.password);
+            setError("");
+
+            const userCredential = await createUserWithEmailAndPassword(
+                auth, form.email, form.password
+            );
+            const token = await userCredential.user.getIdToken(); 
+            await fetch('http://localhost:5000/users/register', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}` 
+                }
+            });
+
             setSuccess(true);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }
+}
 
     return (
         <div>
             <h1>Sign Up</h1>
             {/* Notif */}
-            {error && <p style={{ color: red }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             {success && <p>Account created successfully</p>}
 
             <form onSubmit={SignUp}>

@@ -1,24 +1,31 @@
-import { useState } from "react";
-import { auth } from 'firebase/firestore';
+import { useState, useEffect } from "react";
+import { auth } from '../../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
-
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
-    const [form, setForm ] = useState({
-        email: "",
-        password: ""
-    });
+    const [form, setForm] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess ] = useState(false);
+    const navigate = useNavigate();
+    const { currentUser } = useAuth();
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value});
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
     async function Login(e) {
         e.preventDefault();
         try {
             setLoading(true);
+            setError("");
             await signInWithEmailAndPassword(auth, form.email, form.password);
-            setSuccess(true);
+            
+            //im check role para sa kanilang protected routes.
+            if (currentUser?.role === 'admin') {
+                navigate('/admin');
+            } else if (currentUser?.role === 'employee') {
+                navigate('/dashboard');
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -29,28 +36,21 @@ export default function Login() {
     return (
         <div>
             <h1>Login Here</h1>
-            {error & <p style={{ color:red }}>{error.message}</p>}
-            {success & <p style={{ color: green}}>Welcome Back!</p>}
-
+            {error && <p style={{ color:"red" }}>{error}</p>}
             <form onSubmit={Login}>
                 <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange} 
-                placeholder="Enter your email"/>
-
-                <input 
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                />
-
-                <button
-                type="submit"
-                disabled={loading}>
-                    {loading ? "creating account" : "Sign Up"}
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"/>
+                <input
+                    type="password"
+                    name="password"
+                    value={form.password}
+                    onChange={handleChange}/>
+                <button type="submit" disabled={loading}>
+                    {loading ? "Signing In..." : "Sign In"}
                 </button>
             </form>
         </div>

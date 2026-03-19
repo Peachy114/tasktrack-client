@@ -1,25 +1,37 @@
-import logo from './logo.svg';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import SignUp from './components/auth/Signup';
+import Login from './components/auth/Login';
+import ProtectedRoute from './components/pages/ProtectedRoutes';
+import AdminRoute from './components/pages/AdminRoutes';
+
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+          {/* For the login and logout. */}
+        <Route path="/" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected routes and AdminROutes */}
+        <Route path='/dashboard' element={
+          <ProtectedRoute>
+            <h1>Employee Dashboard.</h1>
+          </ProtectedRoute>
+        }/>
+
+        <Route path='/admin' element={
+          <AdminRoute>
+            <h1>This is the admin Route</h1>
+          </AdminRoute>
+        }
+        />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
 
 export default App;
+
