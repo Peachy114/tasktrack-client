@@ -1,32 +1,43 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SignUp from './components/auth/Signup';
 import Login from './components/auth/Login';
+
 import ProtectedRoute from './components/pages/ProtectedRoutes';
 import AdminRoute from './components/pages/AdminRoutes';
 
 import './App.css';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import AdminLayout from './Layouts/AdminLayout';
+import EmployeeLayout from './Layouts/EmployeeLayout';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-          {/* For the login and logout. */}
-        <Route path="/" element={<SignUp />} />
+        {/* Public Routes */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
 
-        {/* Protected routes and AdminROutes */}
-        <Route path='/dashboard' element={
-          <ProtectedRoute>
-            <h1>Employee Dashboard.</h1>
-          </ProtectedRoute>
-        }/>
-
+        {/* Admin Routes */}
         <Route path='/admin' element={
           <AdminRoute>
-            <h1>This is the admin Route</h1>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
           </AdminRoute>
         }
         />
+
+        {/* Employee Routes */}
+        <Route path='/dashboard' element={
+          <ProtectedRoute>
+            <EmployeeLayout>
+              <EmployeeDashboard />
+            </EmployeeLayout>
+          </ProtectedRoute>
+        }/>
 
       </Routes>
     </BrowserRouter>
