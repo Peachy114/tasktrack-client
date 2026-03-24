@@ -1,11 +1,10 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { auth } from '../firebase';
+import { auth } from '../firebase'
 import { signOut } from 'firebase/auth'
 
-
-// note: I'm still designing 
-export default function AdminLayout({ children }) {
+// im still designing
+export default function EmployeeLayout({ children }) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -19,25 +18,19 @@ export default function AdminLayout({ children }) {
 
   return (
     <div>
-      <nav>
+      {/* Navbar */}
+      <nav className='bg-blue-900'>
         <h2>TaskTrack</h2>
-        
-        <div>
-          <Link to='/admin'>
-            Dashboard
+
+        <div >
+          <Link to='/dashboard'>
+            My Tasks
           </Link>
-          <Link to='/admin/tasks'>
-            Tasks
-          </Link>
-          <Link to='/admin/users'>
-            Users
-          </Link>
-          <button onClick={handleLogout} >
+          <button onClick={handleLogout}>
             Logout
           </button>
         </div>
       </nav>
-
 
       <main>
         {children}

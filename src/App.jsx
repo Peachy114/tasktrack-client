@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SignUp from './components/auth/Signup';
 import Login from './components/auth/Login';
 
-import ProtectedRoute from './components/pages/ProtectedRoutes';
-import AdminRoute from './components/pages/AdminRoutes';
+import ProtectedRoute from './routes/ProtectedRoutes';
+import AdminRoute from './routes/AdminRoutes';
 
 import './App.css';
 import AdminDashboard from './pages/admin/AdminDashboard';
