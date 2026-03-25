@@ -2,14 +2,16 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SignUp from './components/auth/Signup';
 import Login from './components/auth/Login';
 
-import ProtectedRoute from './components/pages/ProtectedRoutes';
-import AdminRoute from './components/pages/AdminRoutes';
+import ProtectedRoute from './routes/ProtectedRoutes';
+import AdminRoute from './routes/AdminRoutes';
 
 import './App.css';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import AdminLayout from './Layouts/AdminLayout';
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import EmployeeLayout from './Layouts/EmployeeLayout';
+import AdminTasks from './pages/admin/AdminTasks';
+
 
 function App() {
   return (
@@ -29,6 +31,15 @@ function App() {
           </AdminRoute>
         }
         />
+        <Route path='/admin/tasks' element={
+          <AdminRoute>
+            <AdminLayout>
+              <AdminTasks />
+            </AdminLayout>
+          </AdminRoute>
+        }
+        />
+
 
         {/* Employee Routes */}
         <Route path='/dashboard' element={
