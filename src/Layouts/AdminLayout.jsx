@@ -1,47 +1,20 @@
 import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { auth } from '../firebase';
-import { signOut } from 'firebase/auth'
+import Navbar from '@/components/shared/Navbar';
+import { useAuth } from '@/context/AuthContext';
+import Sidebar from '@/components/shared/Sidebar';
 
-
-// note: I'm still designing 
 export default function AdminLayout({ children }) {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/login');
-    } catch (err) {
-      console.log(err.message);
-    }
-  }
+  const { currentUser } = useAuth();
 
   return (
     <div>
-      <nav>
-        <h2>TaskTrack</h2>
-        
-        <div className='bg-black'>
-          <Link to='/admin'>
-            Dashboard
-          </Link>
-          <Link to='/admin/tasks'>
-            Tasks
-          </Link>
-          <Link to='/admin/users'>
-            Users
-          </Link>
-          <button onClick={handleLogout} >
-            Logout
-          </button>
-        </div>
-      </nav>
-
-
-      <main>
-        {children}
-      </main>
+      <Navbar role={currentUser?.role} />
+      <div className='flex'>
+        <main className='w-full'>
+          {children}
+        </main>
+        <Sidebar />
+      </div>
     </div>
   )
 }

@@ -3,8 +3,67 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@custom-variant dark (&:is(.dark *));
+:root {
+  /* Primary accent → Deep Blue */
+  --tt-primary: #185FA5;
+  --tt-primary-light: #EEF5FF;
+  --tt-primary-hover: #0C447C;
+  --tt-primary-text: #185FA5;
 
+  /* Secondary accent → Soft Blue */
+  --tt-secondary: #86B6F6;
+  --tt-secondary-light: #f0f6ff;
+  --tt-secondary-text: #185FA5;
+
+  /* Background → Pure white */
+  --tt-bg: #f5f7fa;
+  --tt-bg-card: #ffffff;
+  --tt-bg-muted: #f0f4f8;
+
+  /* Text */
+  --tt-text: #0a1a2e;
+  --tt-text-muted: #4a6080;
+  --tt-text-hint: #86B6F6;
+
+  /* Border */
+  --tt-border: #e4e9f2;
+  --tt-border-hover: #86B6F6;
+
+  /* Status badges */
+  --tt-backlog-bg: #f0f4f8;
+  --tt-backlog-text: #4a6080;
+  --tt-progress-bg: #EEF5FF;
+  --tt-progress-text: #185FA5;
+  --tt-done-bg: #e6f4ec;
+  --tt-done-text: #1a5c35;
+
+  /* Avatar colors */
+  --tt-av1-bg: #EEF5FF; --tt-av1-text: #185FA5;
+  --tt-av2-bg: #e0ecff; --tt-av2-text: #0C447C;
+  --tt-av3-bg: #dde8ff; --tt-av3-text: #0a3566;
+  --tt-av4-bg: #f0f5ff; --tt-av4-text: #185FA5;
+  --tt-av5-bg: #e8f0ff; --tt-av5-text: #0C447C;
+
+  /* Stat cards */
+  --tt-stat-bg: #ffffff;
+  --tt-stat-text: #0a1a2e;
+  --tt-stat1-accent: #185FA5;
+  --tt-stat2-accent: #86B6F6;
+  --tt-stat3-accent: #378ADD;
+  --tt-stat4-accent: #B4D4FF;
+
+  /* Kanban column backgrounds */
+--tt-col-backlog-bg: #f8f9fb;
+--tt-col-backlog-dot: #86B6F6;
+--tt-col-progress-bg: #f8f9fb;
+--tt-col-progress-dot: #185FA5;
+--tt-col-done-bg: #f8f9fb;
+--tt-col-done-dot: #1a5c35;
+}
+
+
+/* @custom-variant dark (&:is(.dark *)); */
+/* 
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -37,63 +96,34 @@
   }
 
   --background: oklch(1 0 0);
-
   --foreground: oklch(0.145 0 0);
-
-  --card: oklch(1 0 0);
-
+  --card: oklch(1 0 );
   --card-foreground: oklch(0.145 0 0);
-
   --popover: oklch(1 0 0);
-
   --popover-foreground: oklch(0.145 0 0);
-
   --primary: oklch(0.205 0 0);
-
   --primary-foreground: oklch(0.985 0 0);
-
   --secondary: oklch(0.97 0 0);
-
   --secondary-foreground: oklch(0.205 0 0);
-
   --muted: oklch(0.97 0 0);
-
   --muted-foreground: oklch(0.556 0 0);
-
   --accent-foreground: oklch(0.205 0 0);
-
   --destructive: oklch(0.577 0.245 27.325);
-
   --input: oklch(0.922 0 0);
-
   --ring: oklch(0.708 0 0);
-
   --chart-1: oklch(0.87 0 0);
-
   --chart-2: oklch(0.556 0 0);
-
   --chart-3: oklch(0.439 0 0);
-
   --chart-4: oklch(0.371 0 0);
-
   --chart-5: oklch(0.269 0 0);
-
   --radius: 0.625rem;
-
   --sidebar: oklch(0.985 0 0);
-
   --sidebar-foreground: oklch(0.145 0 0);
-
   --sidebar-primary: oklch(0.205 0 0);
-
   --sidebar-primary-foreground: oklch(0.985 0 0);
-
   --sidebar-accent: oklch(0.97 0 0);
-
   --sidebar-accent-foreground: oklch(0.205 0 0);
-
   --sidebar-border: oklch(0.922 0 0);
-
   --sidebar-ring: oklch(0.708 0 0)
 }
 
@@ -115,14 +145,14 @@
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
-}
+} */
 
 body {
   margin: 0;
 }
-
+/* 
 #root {
-  width: 1126px;
+  width: 1500px;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
@@ -175,8 +205,9 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
-}
+} */
 
+/* 
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
@@ -218,9 +249,10 @@ code {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-}
+} */
 
-.dark {
+
+/* .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -252,12 +284,12 @@ code {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-}
+} */
 
-@layer base {
+/* @layer base {
   * {
     @apply border-border outline-ring/50;}
   body {
     @apply bg-background text-foreground;}
   html {
-    @apply font-sans;}}
+    @apply font-sans;}} */
