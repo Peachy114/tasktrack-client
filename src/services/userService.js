@@ -1,4 +1,4 @@
-const API = "http://localhost:5000";
+const API = import.meta.env.VITE_API_URL;
 
 export const userService = {
 
@@ -21,7 +21,7 @@ export const userService = {
                 Authorization: `Bearer ${token}`
             }
         });
-        if (!res.ok) throw new Error('Failed to fetch user.');
+        if (!res.ok) throw new Error(`Failed to fetch user: ${res.status}`);
         return res.json();
     },
 
@@ -32,7 +32,7 @@ export const userService = {
                 Authorization: `Bearer ${token}`
             }
         });
-        if (!res.ok) throw new Error('Failed to fetch all users.');
+        if (!res.ok) throw new Error(`Failed to fetch all users: ${res.status}`);
         return res.json();
-    }
+    },
 };
