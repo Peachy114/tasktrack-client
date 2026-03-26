@@ -1,129 +1,86 @@
-import { auth } from '@/firebase'
-import { signOut } from 'firebase/auth'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useFetch } from '../../hook/useFetch'
-import { userService } from '../../services/userService'
-import { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext'
+import { useEffect, useState } from 'react'
+import { useLogout } from '@/hook/useLogout'
 
-
-export default function Navbar({ role }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { data: users, fetch: fetchUsers } = useFetch(userService.getAll)
-  const [notifCount] = useState(3)
+export default function Navbar() {
   const { currentUser } = useAuth();
+  const logout = useLogout();
+  const [dark, setDark] = useState(
+    () => localStorage.getItem('tt-theme') === 'dark'
+  )
 
-  useEffect(() => { fetchUsers() }, [fetchUsers])
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', dark)
+    localStorage.setItem('tt-theme', dark ? 'dark' : 'light')
+  }, [dark])
 
-  const handleLogout = async () => {
-    try { await signOut(auth); navigate('/login') }
-    catch (err) { console.log(err.message) }
-  }
-
-  const adminLinks = [
-    { to: '/admin',       label: 'Dashboard' },
-    { to: '/admin/tasks', label: 'Tasks'     },
-  ]
-  const employeeLinks = [{ to: '/dashboard', label: 'My Tasks' }]
-  const links = role === 'admin' ? adminLinks : employeeLinks
 
   return (
-    <nav
-      className='h-14 px-6 flex items-center justify-between gap-4 sticky top-0 z-50'
-      style={{ background: 'var(--tt-bg-card)', borderBottom: '1px solid var(--tt-border)' }}
-    >
-      {/* ── Left: Logo + nav links ── */}
-      <div className='flex items-center gap-4'>
+    <nav className='h-[var(--tt-navbar-h)] bg-tt-bg-card border-b border-tt-border shadow-[var(--tt-shadow-sm)] 
+    px-4 flex items-center justify-between sticky top-0 z-50'>
 
-        {/* Logo */}
-        <div className='flex items-center gap-2 flex-shrink-0'>
-          <div
-            className='w-7 h-7 rounded-lg flex items-center justify-center'
-            style={{ background: 'var(--tt-primary)' }}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-              <rect x="2" y="2" width="5" height="5" rx="1.5" fill="white"/>
-              <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
-              <rect x="2" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
-              <rect x="9" y="9" width="5" height="5" rx="1.5" fill="white"/>
-            </svg>
-          </div>
-          <span className='text-sm font-bold' style={{ color: 'var(--tt-primary)' }}>TaskTrack</span>
-          <span className='text-xs hidden sm:block' style={{ color: 'var(--tt-text-muted)' }}>
-            — Smart Productivity Hub
-          </span>
+      {/* Left: Logo */}
+      <div className='flex items-center gap-2.5'>
+        <div className='w-7 h-7 rounded-lg bg-tt-primary flex items-center justify-center flex-shrink-0'>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="5" height="5" rx="1.5" fill="white"/>
+            <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
+            <rect x="2" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
+            <rect x="9" y="9" width="5" height="5" rx="1.5" fill="white"/>
+          </svg>
         </div>
-
-        {/* Divider */}
-        <div className='w-px h-5 flex-shrink-0' style={{ background: 'var(--tt-border)' }}/>
-
-        {/* Nav links */}
-        <div className='flex items-center gap-1'>
-          {links.map(link => {
-            const isActive = location.pathname === link.to
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className='text-xs px-3 py-1.5 rounded-full font-medium transition-all hover:opacity-80'
-                style={isActive
-                  ? { background: 'var(--tt-primary)', color: '#ffffff' }
-                  : { color: 'var(--tt-text-muted)', background: 'transparent' }
-                }
-              >
-                {link.label}
-              </Link>
-            )
-          })}
-        </div>
+        <span className='text-sm font-bold text-tt-primary'>TaskTrack</span>
       </div>
 
-      {/* ── Right: icons + avatars + logout ── */}
-      <div className='flex items-center gap-2.5'>
+      {/* Right */}
+      <div className='flex items-center gap-2'>
 
-        {/* Notification bell */}
+        {/* Dark mode toggle */}
         <button
-          className='relative w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity'
-          style={{ background: 'var(--tt-bg-muted)', color: 'var(--tt-text-muted)', border: '1px solid var(--tt-border)' }}
+          onClick={() => setDark(v => !v)}
+          className='w-7 h-7 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
+          title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.17V11a6 6 0 10-12 0v3.17a2 2 0 01-.6 1.42L4 17h5m6 0H9m6 0a3 3 0 11-6 0"
-              stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-          {notifCount > 0 && (
-            <span
-              className='absolute -top-1 -right-1 text-white font-bold rounded-full flex items-center justify-center'
-              style={{ fontSize: 9, background: '#ef4444', minWidth: 16, height: 16, padding: '0 4px' }}
-            >
-              {notifCount}
-            </span>
+          {dark ? (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/>
+              <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           )}
         </button>
 
-        {/* Divider */}
-        <div className='w-px h-5' style={{ background: 'var(--tt-border)' }}/>
-
+        <div className='w-px h-5 bg-tt-border' />
 
         {/* User chip */}
-        <div
-          className='flex items-center gap-2 px-2 py-1 rounded-full'
-          style={{ background: 'var(--tt-bg-muted)', border: '1px solid var(--tt-border)' }}
-        >
-          <div
-            className='w-5 h-5 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0'
-            style={{ fontSize: 10, background: 'var(--tt-primary)' }}
-          >
+        <div className='flex items-center gap-2 px-2.5 py-1 rounded-full bg-tt-bg-muted border border-tt-border'>
+          <div className='w-5 h-5 rounded-full bg-tt-primary flex items-center justify-center text-white font-bold flex-shrink-0 text-[10px]'>
             {currentUser?.email?.[0].toUpperCase()}
           </div>
-          <span className='text-xs font-semibold hidden sm:block' style={{ color: 'var(--tt-text)' }}>{currentUser?.email?.split('@')[0]}</span>
+          <span className='text-xs font-semibold text-tt-text hidden sm:block'>
+            {currentUser?.email?.split('@')[0]}
+          </span>
+          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium hidden sm:block ${
+            currentUser?.role === 'admin'
+              ? 'bg-tt-primary-light text-tt-primary'
+              : 'bg-tt-progress-bg text-tt-progress-text'
+          }`}>
+            {currentUser?.role}
+          </span>
         </div>
+
+        <div className='w-px h-5 bg-tt-border' />
+
 
         {/* Sign out */}
         <button
-          onClick={handleLogout}
-          className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity bg-transparent'
-          style={{ border: '1px solid var(--tt-border)', color: 'var(--tt-text-muted)' }}
+          onClick={logout}
+          className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
         >
           <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
             <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6"
@@ -131,6 +88,8 @@ export default function Navbar({ role }) {
           </svg>
           Sign out
         </button>
+
+
       </div>
     </nav>
   )

@@ -1,4 +1,4 @@
-const API = `http://localhost:5000`;
+const API = import.meta.env.VITE_API_URL;
 
 
 //this is para sa API calls make the code shorter and reusable.
@@ -15,7 +15,7 @@ export const taskService = {
 
     //Get specific tasks
     getById: async (token, taskId) => {
-        const res = await false(`${API}/tasks/${taskId}`, {
+        const res = await fetch(`${API}/tasks/${taskId}`, {
             headers: { Authorization: `Bearer ${token}`}
         });
         if (!res.ok) throw new Error('Failed to fetch tasks');
@@ -71,5 +71,5 @@ export const taskService = {
         });
         if (!res.ok) throw new Error('Failed to update status.');
         return res.json();
-    }
+    },
 }

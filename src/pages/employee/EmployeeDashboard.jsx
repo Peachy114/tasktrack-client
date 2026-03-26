@@ -64,111 +64,68 @@
 //   )
 // }
 
+// DEBUGGINGGGGGGGGGGGGGGGGG ------------------------------------------------------------------------
 
-
-import { useEffect, useState } from 'react'
-import { useStatus } from '../../hook/useStatus'
+import { useEffect, useState, useMemo } from 'react'
 import { useFetch } from '../../hook/useFetch'
 import { taskService } from '../../services/taskServices'
 import { getToken } from '../../utils/getToken'
 import EmployeeTaskCard from '@/components/shared/employee/TaskCard'
 
 const COLUMNS = [
-  {
-    key:     'backlog',
-    label:   'To Do',
-    colBg:   'var(--tt-col-backlog-bg)',
-    accent:  '#185FA5',
-    countBg: '#EEF5FF',
-  },
-  {
-    key:     'in_progress',
-    label:   'In Progress',
-    colBg:   'var(--tt-col-progress-bg)',
-    accent:  '#f97316',
-    countBg: '#fff7ed',
-  },
-  {
-    key:     'done',
-    label:   'Done',
-    colBg:   'var(--tt-col-done-bg)',
-    accent:  '#22c55e',
-    countBg: '#f0fdf4',
-  },
+  { key: 'backlog',     label: 'To Do',       colBg: 'var(--tt-col-backlog-bg)',  accent: '#185FA5', countBg: '#EEF5FF' },
+  { key: 'in_progress', label: 'In Progress', colBg: 'var(--tt-col-progress-bg)', accent: '#f97316', countBg: '#fff7ed' },
+  { key: 'done',        label: 'Done',        colBg: 'var(--tt-col-done-bg)',     accent: '#22c55e', countBg: '#f0fdf4' },
 ]
 
 const MAX_VISIBLE = 5
 
 export default function EmployeeDashboard() {
-  const { error } = useStatus()
   const { data: tasks, fetch: fetchTasks } = useFetch(taskService.getMy)
   const [dragOver, setDragOver] = useState(null)
   const [expanded, setExpanded] = useState({})
   const [search,   setSearch]   = useState('')
+  const [error,    setError]    = useState(null)
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 
+  const total      = tasks.length
+  const done       = useMemo(() => tasks.filter(t => t.status === 'done').length,        [tasks])
+  const inProgress = useMemo(() => tasks.filter(t => t.status === 'in_progress').length, [tasks])
+  const todo       = useMemo(() => tasks.filter(t => t.status === 'backlog').length,      [tasks])
+  const percent    = total > 0 ? Math.round((done / total) * 100) : 0
+
+  const filteredTasks = useMemo(() =>
+    tasks.filter(task =>
+      task.title.toLowerCase().includes(search.toLowerCase()) ||
+      task.description?.toLowerCase().includes(search.toLowerCase())
+    ), [tasks, search])
+
+  // ── Drag-and-drop status update (same API as button) ──────────────────
   const handleStatusUpdate = async (taskId, status) => {
     try {
+      setError(null)
       const token = await getToken()
-      await taskService.updateStatus(token, taskId, status)
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL ?? 'http://localhost:5000'}/tasks/${taskId}/status`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ status }),
+        }
+      )
+      if (!res.ok) throw new Error('Failed to update status')
       fetchTasks()
-    } catch (err) { console.log(err.message) }
+    } catch (err) { setError(err.message) }
   }
 
-  const toggleExpand = (key) => setExpanded({ ...expanded, [key]: !expanded[key] })
+  const toggleExpand = (key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] }))
 
-  const filteredTasks = tasks.filter(task =>
-    task.title.toLowerCase().includes(search.toLowerCase()) ||
-    task.description?.toLowerCase().includes(search.toLowerCase())
-  )
-
-  // ── Stats ──
-  const total      = tasks.length
-  const inProgress = tasks.filter(t => t.status === 'in_progress').length
-  const done       = tasks.filter(t => t.status === 'done').length
-  const percent    = total === 0 ? 0 : Math.round((done / total) * 100)
-
-  const stats = [
-    {
-      label:   'Total Tasks',
-      value:   total,
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <rect x="1" y="3" width="4" height="10" rx="1.5" fill="currentColor" opacity=".4"/>
-          <rect x="6" y="1" width="4" height="12" rx="1.5" fill="currentColor" opacity=".7"/>
-          <rect x="11" y="5" width="4" height="8"  rx="1.5" fill="currentColor"/>
-        </svg>
-      ),
-      accent:  'var(--tt-primary)',
-      bg:      'var(--tt-primary-light)',
-    },
-    {
-      label:   'In Progress',
-      value:   inProgress,
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2"/>
-          <path d="M8 5v3l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-      ),
-      accent:  '#f97316',
-      bg:      '#fff7ed',
-    },
-    {
-      label:   'Completion',
-      value:   `${percent}%`,
-      icon: (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" opacity=".3"/>
-          <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ),
-      accent:  '#22c55e',
-      bg:      '#f0fdf4',
-      // show progress bar only on this card
-      progress: percent,
-    },
+  const STATS = [
+    { label: 'Total Tasks', value: total,      color: 'var(--tt-primary)',  bg: 'var(--tt-primary-light)' },
+    { label: 'In Progress', value: inProgress, color: '#f97316',            bg: '#fff7ed'                 },
+    { label: 'Completed',   value: done,        color: '#22c55e',           bg: '#f0fdf4'                 },
+    { label: 'To Do',       value: todo,        color: '#185FA5',           bg: '#EEF5FF'                 },
   ]
 
   return (
@@ -181,7 +138,7 @@ export default function EmployeeDashboard() {
             <p className='text-xs font-medium mb-0.5' style={{ color: 'var(--tt-text-hint)' }}>Board</p>
             <h1 className='text-2xl font-bold' style={{ color: 'var(--tt-primary)' }}>My Tasks</h1>
             <p className='text-xs mt-0.5' style={{ color: 'var(--tt-text-muted)' }}>
-              {filteredTasks.length} of {tasks.length} tasks assigned to you
+              {filteredTasks.length} of {total} tasks assigned to you
             </p>
           </div>
         </div>
@@ -189,44 +146,40 @@ export default function EmployeeDashboard() {
         {error && <p className='text-red-500 text-xs mb-4'>{error}</p>}
 
         {/* ── Stats row ── */}
-        <div className='grid grid-cols-3 gap-3 mb-5'>
-          {stats.map(stat => (
+        <div className='grid grid-cols-4 gap-3 mb-5'>
+          {STATS.map(stat => (
             <div key={stat.label}
-              className='rounded-xl p-4'
+              className='rounded-xl px-4 py-3 flex items-center justify-between'
               style={{ background: 'var(--tt-bg-card)', border: '1px solid var(--tt-border)' }}>
-
-              {/* Top row */}
-              <div className='flex items-center justify-between mb-3'>
-                <p className='text-xs font-medium' style={{ color: 'var(--tt-text-muted)' }}>
-                  {stat.label}
-                </p>
-                <div className='w-7 h-7 rounded-lg flex items-center justify-center'
-                  style={{ background: stat.bg, color: stat.accent }}>
-                  {stat.icon}
-                </div>
+              <div>
+                <p className='text-xs' style={{ color: 'var(--tt-text-muted)' }}>{stat.label}</p>
+                <p className='text-xl font-bold mt-0.5' style={{ color: stat.color }}>{stat.value}</p>
               </div>
-
-              {/* Value */}
-              <p className='text-2xl font-bold' style={{ color: stat.accent }}>
-                {stat.value}
-              </p>
-
-              {/* Progress bar — only for completion */}
-              {stat.progress !== undefined && (
-                <div className='mt-2.5'>
-                  <div className='w-full rounded-full overflow-hidden'
-                    style={{ height: 4, background: 'var(--tt-border)' }}>
-                    <div className='h-full rounded-full transition-all duration-500'
-                      style={{ width: `${stat.progress}%`, background: stat.accent }}/>
-                  </div>
-                  <p className='text-xs mt-1' style={{ color: 'var(--tt-text-hint)' }}>
-                    {done} of {total} done
-                  </p>
-                </div>
-              )}
+              <div className='w-9 h-9 rounded-full flex items-center justify-center'
+                style={{ background: stat.bg }}>
+                <span className='text-sm font-bold' style={{ color: stat.color }}>{stat.value}</span>
+              </div>
             </div>
           ))}
         </div>
+
+        {/* ── Progress bar ── */}
+        {total > 0 && (
+          <div className='rounded-xl px-4 py-3 mb-5'
+            style={{ background: 'var(--tt-bg-card)', border: '1px solid var(--tt-border)' }}>
+            <div className='flex items-center justify-between mb-2'>
+              <p className='text-xs font-medium' style={{ color: 'var(--tt-text)' }}>Overall Progress</p>
+              <p className='text-xs font-bold' style={{ color: '#22c55e' }}>{percent}%</p>
+            </div>
+            <div className='w-full rounded-full h-1.5' style={{ background: 'var(--tt-border)' }}>
+              <div className='h-1.5 rounded-full transition-all duration-500'
+                style={{ width: `${percent}%`, background: '#22c55e' }}/>
+            </div>
+            <p className='text-xs mt-1.5' style={{ color: 'var(--tt-text-hint)' }}>
+              {done} of {total} tasks completed
+            </p>
+          </div>
+        )}
 
         {/* ── Board card ── */}
         <div className='rounded-2xl'
@@ -235,12 +188,11 @@ export default function EmployeeDashboard() {
           {/* Toolbar */}
           <div className='flex items-center justify-between px-5 py-3'
             style={{ borderBottom: '1px solid var(--tt-border)', background: 'var(--tt-bg-muted)' }}>
-
             <div className='flex items-center gap-2'>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <rect x="1" y="3" width="4" height="10" rx="1.5" fill="var(--tt-primary)" opacity=".4"/>
                 <rect x="6" y="1" width="4" height="12" rx="1.5" fill="var(--tt-primary)" opacity=".7"/>
-                <rect x="11" y="5" width="4" height="8"  rx="1.5" fill="var(--tt-primary)"/>
+                <rect x="11" y="5" width="4" height="8" rx="1.5" fill="var(--tt-primary)"/>
               </svg>
               <p className='text-sm font-semibold' style={{ color: 'var(--tt-primary)' }}>Task Board</p>
               <span className='text-xs px-2 py-0.5 rounded-full font-medium'
@@ -276,9 +228,10 @@ export default function EmployeeDashboard() {
                   className='p-3 transition-all'
                   style={{
                     borderRight:   ci < 2 ? '1px solid var(--tt-border)' : 'none',
-                    background:    col.colBg,
+                    background:    isOver ? `color-mix(in srgb, ${col.colBg} 80%, ${col.accent} 20%)` : col.colBg,
                     outline:       isOver ? `2px dashed ${col.accent}` : '2px dashed transparent',
                     outlineOffset: '-3px',
+                    transition:    'background 0.15s, outline 0.15s',
                   }}
                   onDragOver={(e) => { e.preventDefault(); setDragOver(col.key) }}
                   onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
@@ -287,8 +240,8 @@ export default function EmployeeDashboard() {
                     const taskId = e.dataTransfer.getData('taskId')
                     if (taskId) handleStatusUpdate(taskId, col.key)
                     setDragOver(null)
-                  }}>
-
+                  }}
+                >
                   {/* Column header */}
                   <div className='flex items-center gap-1.5 mb-2.5 px-0.5'>
                     <div className='w-2.5 h-2.5 rounded-full' style={{ background: col.accent }}/>
@@ -299,11 +252,14 @@ export default function EmployeeDashboard() {
                     </span>
                   </div>
 
-                  {/* Task cards */}
+                  {/* ── Pass onStatusChange so buttons work ── */}
                   {visible.map(task => (
-                    <EmployeeTaskCard key={task.id} task={task} />
+                    <EmployeeTaskCard
+                      key={task.id}
+                      task={task}
+                      onStatusChange={fetchTasks}
+                    />
                   ))}
-
 
                   {/* Empty state */}
                   {colTasks.length === 0 && (
@@ -319,7 +275,6 @@ export default function EmployeeDashboard() {
                     </div>
                   )}
 
-                  {/* Show more / less */}
                   {!isExpanded && remaining > 0 && (
                     <button onClick={() => toggleExpand(col.key)}
                       className='w-full text-xs py-1.5 rounded-xl hover:opacity-80 mt-1.5 bg-transparent font-medium'
@@ -327,7 +282,6 @@ export default function EmployeeDashboard() {
                       + {remaining} more
                     </button>
                   )}
-
                   {isExpanded && colTasks.length > MAX_VISIBLE && (
                     <button onClick={() => toggleExpand(col.key)}
                       className='w-full text-xs py-1.5 rounded-xl hover:opacity-80 mt-1.5 bg-transparent'

@@ -3,293 +3,168 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
+@theme {
+  /* ── Primary ── */
+  --color-tt-white:                #ffffff;
+  --color-tt-primary:              #0052CC;
+  --color-tt-primary-light:        #E6EEFB;
+  --color-tt-primary-hover:        #0747A6;
+  --color-tt-primary-muted:        #4C9AFF;
+ 
+  /* ── Secondary ── */
+  --color-tt-secondary:            #0079BF;
+  --color-tt-secondary-light:      #E4F0F6;
+
+  /* ── 🆕 Dashboard Specifics (Added) ── */
+  --color-tt-indigo:               #4F46E5;
+  --color-tt-indigo-light:         #EEF2FF;
+  --color-tt-purple:               #7C3AED;
+  --color-tt-purple-light:         #F5F3FF;
+  --color-tt-purple-muted:         #C4B5FD;
+  --color-tt-orange:               #EA580C;
+  --color-tt-orange-light:         #FFF7ED;
+  --color-tt-slate-muted:          #94A3B8;
+  --color-tt-slate-light:          #F1F5F9;
+  --color-tt-slate-bg:             #F8FAFC;
+ 
+  /* ── Backgrounds ── */
+  --color-tt-bg:                   #F4F5F7;
+  --color-tt-bg-card:              #FFFFFF;
+  --color-tt-bg-muted:             #EBECF0;
+ 
+  /* ── Text ── */
+  --color-tt-text:                 #172B4D;
+  --color-tt-text-muted:           #5E6C84;
+  --color-tt-text-hint:             #97A0AF;
+ 
+  /* ── Borders ── */
+  --color-tt-border:               #DFE1E6;
+  --color-tt-border-hover:         #C1C7D0;
+ 
+  /* ── Status: Backlog ── */
+  --color-tt-backlog-bg:           #EBECF0;
+  --color-tt-backlog-text:         #42526E;
+  --color-tt-col-backlog-bg:       #EBECF0;
+  --color-tt-col-backlog-dot:      #97A0AF;
+  --color-tt-col-backlog-accent:   #42526E;
+  --color-tt-col-backlog-count:    #EBECF0;
+ 
+  /* ── Status: In Progress ── */
+  --color-tt-progress-bg:          #DEEBFF;
+  --color-tt-progress-text:        #0052CC;
+  --color-tt-col-progress-bg:      #E6EEFB;
+  --color-tt-col-progress-dot:     #0052CC;
+  --color-tt-col-progress-accent:  #0052CC;
+  --color-tt-col-progress-count:   #DEEBFF;
+ 
+  /* ── Status: Done ── */
+  --color-tt-done-bg:              #E3FCEF;
+  --color-tt-done-text:            #006644;
+  --color-tt-col-done-bg:          #E3FCEF;
+  --color-tt-col-done-dot:         #006644;
+  --color-tt-col-done-accent:      #006644;
+  --color-tt-col-done-count:       #E3FCEF;
+ 
+  /* ── Avatars ── */
+  --color-tt-av1-bg:               #DEEBFF;
+  --color-tt-av1-text:             #0052CC;
+  --color-tt-av2-bg:               #E3FCEF;
+  --color-tt-av2-text:             #006644;
+  --color-tt-av3-bg:               #FFF0B3;
+  --color-tt-av3-text:             #FF8B00;
+  --color-tt-av4-bg:               #FFE2D9;
+  --color-tt-av4-text:             #BF2600;
+  --color-tt-av5-bg:               #EAE6FF;
+  --color-tt-av5-text:             #403294;
+}
+ 
+/* ============================================================
+   CSS Variables
+   ============================================================ */
 :root {
-  /* Primary accent → Deep Blue */
-  --tt-primary: #185FA5;
-  --tt-primary-light: #EEF5FF;
-  --tt-primary-hover: #0C447C;
-  --tt-primary-text: #185FA5;
+  --gradient-tt-bg: linear-gradient(135deg, #5e60c2 0%, #9596CF 50%, #bbc1e9 100%);
+  --tt-bg-overlay:   rgba(9, 30, 66, 0.54);
+  --tt-navbar-h:     48px;
+  --tt-shadow-sm:    0 1px 3px rgba(9,30,66,0.13), 0 0 0 1px rgba(9,30,66,0.08);
+  --tt-shadow-md:    0 4px 12px rgba(9,30,66,0.15), 0 0 0 1px rgba(9,30,66,0.08);
+  --tt-shadow-lg:    0 8px 24px rgba(9,30,66,0.18), 0 0 0 1px rgba(9,30,66,0.08);
+  /* 🆕 Matches your dashboard cards */
+  --tt-shadow-card:  0 2px 16px rgba(15,23,42,0.07); 
+} 
+ 
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+.dark {
+  /* ── Primary ── */
+  --color-tt-primary:              #4C9AFF;
+  --color-tt-primary-light:        #1A2D4A;
+  --color-tt-primary-hover:        #2D7DD2;
+  --color-tt-primary-muted:        #85B8FF;
+ 
+  /* ── Secondary ── */
+  --color-tt-secondary:            #2D7DD2;
+  --color-tt-secondary-light:      #0E2A42;
 
-  /* Secondary accent → Soft Blue */
-  --tt-secondary: #86B6F6;
-  --tt-secondary-light: #f0f6ff;
-  --tt-secondary-text: #185FA5;
-
-  /* Background → Pure white */
-  --tt-bg: #f5f7fa;
-  --tt-bg-card: #ffffff;
-  --tt-bg-muted: #f0f4f8;
-
-  /* Text */
-  --tt-text: #0a1a2e;
-  --tt-text-muted: #4a6080;
-  --tt-text-hint: #86B6F6;
-
-  /* Border */
-  --tt-border: #e4e9f2;
-  --tt-border-hover: #86B6F6;
-
-  /* Status badges */
-  --tt-backlog-bg: #f0f4f8;
-  --tt-backlog-text: #4a6080;
-  --tt-progress-bg: #EEF5FF;
-  --tt-progress-text: #185FA5;
-  --tt-done-bg: #e6f4ec;
-  --tt-done-text: #1a5c35;
-
-  /* Avatar colors */
-  --tt-av1-bg: #EEF5FF; --tt-av1-text: #185FA5;
-  --tt-av2-bg: #e0ecff; --tt-av2-text: #0C447C;
-  --tt-av3-bg: #dde8ff; --tt-av3-text: #0a3566;
-  --tt-av4-bg: #f0f5ff; --tt-av4-text: #185FA5;
-  --tt-av5-bg: #e8f0ff; --tt-av5-text: #0C447C;
-
-  /* Stat cards */
-  --tt-stat-bg: #ffffff;
-  --tt-stat-text: #0a1a2e;
-  --tt-stat1-accent: #185FA5;
-  --tt-stat2-accent: #86B6F6;
-  --tt-stat3-accent: #378ADD;
-  --tt-stat4-accent: #B4D4FF;
-
-  /* Kanban column backgrounds */
---tt-col-backlog-bg: #f8f9fb;
---tt-col-backlog-dot: #86B6F6;
---tt-col-progress-bg: #f8f9fb;
---tt-col-progress-dot: #185FA5;
---tt-col-done-bg: #f8f9fb;
---tt-col-done-dot: #1a5c35;
+  /* ── 🆕 Dashboard Specifics Dark (Added) ── */
+  --color-tt-indigo:               #818CF8;
+  --color-tt-indigo-light:         #1E1B4B;
+  --color-tt-purple:               #A78BFA;
+  --color-tt-purple-light:         #2E1065;
+  --color-tt-slate-bg:             #1C2127;
+ 
+  /* ── Backgrounds ── */
+  --color-tt-bg:                   #1D2125;
+  --color-tt-bg-card:              #22272B;
+  --color-tt-bg-muted:             #282E33;
+ 
+  /* ── Text ── */
+  --color-tt-text:                 #B6C2CF;
+  --color-tt-text-muted:           #7C8DA1;
+  --color-tt-text-hint:             #596773;
+ 
+  /* ── Borders ── */
+  --color-tt-border:               #2C353D;
+  --color-tt-border-hover:         #3D4E5C;
+ 
+  /* ── Status: Backlog ── */
+  --color-tt-backlog-bg:           #2C353D;
+  --color-tt-backlog-text:         #7C8DA1;
+  --color-tt-col-backlog-bg:       #1D2125;
+  --color-tt-col-backlog-dot:      #596773;
+  --color-tt-col-backlog-accent:   #7C8DA1;
+  --color-tt-col-backlog-count:    #2C353D;
+ 
+  /* ── Status: In Progress ── */
+  --color-tt-progress-bg:          #1A2D4A;
+  --color-tt-progress-text:        #4C9AFF;
+  --color-tt-col-progress-bg:      #1A2433;
+  --color-tt-col-progress-dot:     #4C9AFF;
+  --color-tt-col-progress-accent:  #4C9AFF;
+  --color-tt-col-progress-count:   #1A2D4A;
+ 
+  /* ── Status: Done ── */
+  --color-tt-done-bg:              #1A3328;
+  --color-tt-done-text:            #4BCE97;
+  --color-tt-col-done-bg:          #192D22;
+  --color-tt-col-done-dot:         #4BCE97;
+  --color-tt-col-done-accent:      #4BCE97;
+  --color-tt-col-done-count:       #1A3328;
+ 
+  /* ── Avatars ── */
+  --color-tt-av1-bg:               #1A2D4A;
+  --color-tt-av1-text:             #4C9AFF;
+  --color-tt-av2-bg:               #1A3328;
+  --color-tt-av2-text:             #4BCE97;
+  --color-tt-av3-bg:               #332D00;
+  --color-tt-av3-text:             #F5CD47;
+  --color-tt-av4-bg:               #3D1A14;
+  --color-tt-av4-text:             #F87462;
+  --color-tt-av5-bg:               #2D2557;
+  --color-tt-av5-text:             #9F8FEF;
+ 
+  /* ── Shadows ── */
+  --tt-shadow-sm:    0 1px 3px rgba(0,0,0,0.36), 0 0 0 1px rgba(255,255,255,0.04);
+  --tt-shadow-md:    0 4px 12px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.04);
+  --tt-shadow-lg:    0 8px 32px rgba(0,0,0,0.48), 0 0 0 1px rgba(255,255,255,0.06);
 }
-
-
-/* @custom-variant dark (&:is(.dark *)); */
-/* 
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: oklch(0.922 0 0);
-  --code-bg: #f4f3ec;
-  --accent: oklch(0.97 0 0);
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 );
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0)
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-} */
-
-body {
-  margin: 0;
-}
-/* 
-#root {
-  width: 1500px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
-} */
-
-/* 
-@theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-} */
-
-
-/* .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-} */
-
-/* @layer base {
-  * {
-    @apply border-border outline-ring/50;}
-  body {
-    @apply bg-background text-foreground;}
-  html {
-    @apply font-sans;}} */
