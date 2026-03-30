@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import activityService from '@/services/activityServices'
+import { avatarCls } from '@/utils/helper'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatTime(date) {
@@ -33,20 +34,6 @@ const STATUS_BADGE = {
 const TYPE_META = {
   task_created:   { badgeCls: 'bg-tt-indigo-light text-tt-indigo',  label: 'Created'  },
   status_changed: { badgeCls: 'bg-tt-orange-light text-tt-orange',  label: 'Status'   },
-}
-
-const AV_COLORS = [
-  'bg-tt-av1-bg text-tt-av1-text',
-  'bg-tt-av2-bg text-tt-av2-text',
-  'bg-tt-av3-bg text-tt-av3-text',
-  'bg-tt-av4-bg text-tt-av4-text',
-  'bg-tt-av5-bg text-tt-av5-text',
-]
-
-function avatarCls(email = '') {
-  let hash = 0
-  for (let i = 0; i < email.length; i++) hash = email.charCodeAt(i) + ((hash << 5) - hash)
-  return AV_COLORS[Math.abs(hash) % AV_COLORS.length]
 }
 
 function getLabel(activity) {
@@ -111,9 +98,11 @@ function DateDivider({ label }) {
 }
 
 function ActivityRow({ activity }) {
-  const meta        = TYPE_META[activity.type] ?? TYPE_META.task_created
+  const meta = TYPE_META[activity.type] ?? TYPE_META.task_created
   const { action, target } = getLabel(activity)
-  const displayName = activity.userEmail ? activity.userEmail.split('@')[0] : 'Admin'
+  const displayName = activity.userEmail
+    ? activity.userEmail.split('@')[0]
+    : 'Admin'
   const statusBadge = activity.nextStatus ? STATUS_BADGE[activity.nextStatus] : null
 
   return (
@@ -121,30 +110,43 @@ function ActivityRow({ activity }) {
       <Avatar email={activity.userEmail ?? 'admin'} />
 
       <div className='flex-1 min-w-0'>
-        {/* Top row */}
+        {/* Name + Time on the same row */}
         <div className='flex items-center justify-between gap-2 mb-1'>
-          <span className='text-[11px] font-bold text-tt-text capitalize truncate'>{displayName}</span>
-          <span className='text-[10px] text-tt-text-hint flex-shrink-0'>{formatTime(activity.createdAt)}</span>
+          <span className='text-[11px] font-bold text-tt-text capitalize truncate'>
+            {displayName}
+          </span>
+          <span className='text-[10px] text-tt-text-hint flex-shrink-0'>
+            {formatTime(activity.createdAt)}
+          </span>
         </div>
 
         {/* Action row */}
         <div className='flex items-center gap-1.5 flex-wrap'>
-          <span className='text-[10px] text-tt-text-muted'>
-            {activity.type === 'task_created' ? 'Created' : 'Marked'}
-          </span>
-
-          {target && (
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full truncate max-w-[120px] inline-block ${meta.badgeCls}`}>
-              {target}
-            </span>
-          )}
-
-          {activity.type === 'status_changed' && statusBadge && (
+          {activity.type === 'task_created' ? (
             <>
-              <span className='text-[10px] text-tt-text-hint'>as</span>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge}`}>
-                {action}
-              </span>
+              <span className='text-[10px] text-tt-text-muted'>Created</span>
+              {target && (
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full truncate max-w-[120px] inline-block ${meta.badgeCls}`}>
+                  {target}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <span className='text-[10px] text-tt-text-muted'>Marked</span>
+              {target && (
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full truncate max-w-[120px] inline-block ${meta.badgeCls}`}>
+                  {target}
+                </span>
+              )}
+              {statusBadge && (
+                <>
+                  <span className='text-[10px] text-tt-text-hint'>as</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge}`}>
+                    {STATUS_LABEL[activity.nextStatus] ?? activity.nextStatus}
+                  </span>
+                </>
+              )}
             </>
           )}
         </div>
@@ -190,7 +192,7 @@ export default function Activity() {
   const itemCount = filtered.length 
 
   return (
-    <div className='py-6 px-6 h-96 max-w-7xl mx-auto overflow-auto'>
+    <div className='py-6 h-96 max-w-7xl mx-auto overflow-auto'>
       <div className='bg-tt-bg-card rounded-2xl border border-tt-border h-full flex flex-col overflow-hidden'>
 
         {/* ── Toolbar (matches AdminTask style) ── */}

@@ -168,3 +168,18 @@
   --tt-shadow-md:    0 4px 12px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.04);
   --tt-shadow-lg:    0 8px 32px rgba(0,0,0,0.48), 0 0 0 1px rgba(255,255,255,0.06);
 }
+
+/* body {
+  user-select: none;
+} */
+
+
+/* ── Scrollbar ── */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}

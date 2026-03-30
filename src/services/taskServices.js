@@ -2,6 +2,7 @@ const API = import.meta.env.VITE_API_URL;
 
 
 //this is para sa API calls make the code shorter and reusable.
+//The delivery guy — just fetches data=============================================================================
 export const taskService = {
     //Get All tasks
     getAll: async (token) => {
