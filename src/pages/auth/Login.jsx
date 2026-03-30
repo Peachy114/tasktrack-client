@@ -25,7 +25,17 @@ export default function Login() {
       setError("")
       await signInWithEmailAndPassword(auth, form.email, form.password)
     } catch (err) {
-      setError(err.message)
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        setError('No account found with this email.')
+      } else if (err.code === 'auth/wrong-password') {
+        setError('Incorrect password. Please try again.')
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.')
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many attempts. Please try again later.')
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     } finally {
       setLoading(false)
     }

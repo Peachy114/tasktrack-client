@@ -19,5 +19,5 @@ export function useStatus() {
     const fail = (message) => setError(message);
     const succeed = () => setSuccess(true);
 
-    return { loading, error, success, start, done, fail, succeed };
+    return { loading, error, success, start, done, fail, succeed, reset };
 }

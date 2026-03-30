@@ -38,7 +38,7 @@ function AssignDropdown({ pos, employeeUsers, onSelect, onClose }) {
   return createPortal(
     <div
       ref={ref}
-      style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 9999, width: 200, boxShadow: 'var(--tt-shadow-md)' }}
+      style={{ position: 'absolute', top: pos.top, right: pos.right, zIndex: 9999, width: 200, boxShadow: 'var(--tt-shadow-md)' }}
       className='rounded-xl py-1 bg-tt-bg-card border border-tt-border'
     >
       <div className='px-2 pt-1 pb-1.5 border-b border-tt-border'>
@@ -58,7 +58,7 @@ function AssignDropdown({ pos, employeeUsers, onSelect, onClose }) {
         </div>
       </div>
 
-      <div className='max-h-[180px] overflow-y-auto'>
+      <div className='max-h-[180px] overflow-y-auto h-30'>
         {employeeUsers.length === 0 ? (
           <p className='text-xs px-3 py-2 text-center text-tt-text-hint'>No employees found</p>
         ) : filtered.length === 0 ? (
@@ -131,27 +131,29 @@ const TaskCard = memo(function TaskCard({ task, users, onSelectUser, onAssign })
       </div>
 
       {/* Footer: assignee name + avatar */}
-      <div className='flex items-center justify-between pt-1.5 border-t border-tt-border'>
-        <p className='text-xs truncate flex-1 text-tt-text-hint'>
-          {task.assignedEmail ? task.assignedEmail.split('@')[0] : 'Unassigned'}
-        </p>
-        <div
-          ref={avatarRef}
-          onClick={handleAvatarClick}
-          className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center cursor-pointer flex-shrink-0 hover:opacity-80 transition-opacity ${getAvatarClass(assignedIndex)}`}
-        >
-          {task.assignedEmail ? task.assignedEmail[0].toUpperCase() : '+'}
+      <div className='relative'>
+        <div className='flex items-center justify-between pt-1.5 border-t border-tt-border'>
+          <p className='text-xs truncate flex-1 text-tt-text-hint'>
+            {task.assignedEmail ? task.assignedEmail.split('@')[0] : 'Unassigned'}
+          </p>
+          <div
+            ref={avatarRef}
+            onClick={handleAvatarClick}
+            className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center cursor-pointer flex-shrink-0 hover:opacity-80 transition-opacity ${getAvatarClass(assignedIndex)}`}
+          >
+            {task.assignedEmail ? task.assignedEmail[0].toUpperCase() : '+'}
+          </div>
         </div>
-      </div>
 
-      {showDropdown && (
-        <AssignDropdown
-          pos={dropdownPos}
-          employeeUsers={employeeUsers}
-          onSelect={handleSelect}
-          onClose={handleClose}
-        />
-      )}
+        {showDropdown && (
+          <AssignDropdown
+            pos={dropdownPos}
+            employeeUsers={employeeUsers}
+            onSelect={handleSelect}
+            onClose={handleClose}
+          />
+        )}
+        </div>
     </div>
   )
 })

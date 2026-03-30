@@ -2,6 +2,7 @@ import { useState } from "react"
 import { auth } from "../../firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:5000'
 
@@ -9,7 +10,6 @@ export default function SignUp() {
   const [form, setForm]       = useState({ email: "", password: "" })
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState("")
-  const [success, setSuccess] = useState(false)
   const navigate              = useNavigate()
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
@@ -25,10 +25,18 @@ export default function SignUp() {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       })
-      setSuccess(true)
+      toast.success('Account created! Redirecting…')
       setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
-      setError(err.message)
+       if (err.code === 'auth/email-already-in-use') {
+        setError('This email is already registered. Please log in instead.')
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters.')
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.')
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -70,17 +78,6 @@ export default function SignUp() {
             </div>
           )}
 
-          {/* Success */}
-          {success && (
-            <div className='bg-tt-done-bg border border-tt-border border-l-4 border-l-green-500 rounded-xl p-3 flex items-center gap-2'>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5" className='text-tt-done-text'/>
-                <path d="M4 7l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className='text-tt-done-text'/>
-              </svg>
-              <p className='text-xs text-tt-done-text'>Account created! Redirecting to login…</p>
-            </div>
-          )}
-
           <form onSubmit={handleSignUp} className='flex flex-col gap-4'>
 
             {/* Email */}
@@ -105,7 +102,7 @@ export default function SignUp() {
 
             {/* Submit */}
             <button
-              type="submit" disabled={loading || success}
+              type="submit" disabled={loading}
               className='w-full py-3 mt-1 text-sm font-bold rounded-xl border-none bg-tt-primary text-white hover:opacity-90 transition-opacity disabled:bg-tt-border disabled:text-tt-text-muted disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {loading ? (

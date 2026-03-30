@@ -1,13 +1,14 @@
 import { useAuth } from '@/context/AuthContext'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLogout } from '@/hook/useLogout'
 
 export default function Navbar() {
   const { currentUser } = useAuth();
   const logout = useLogout();
-  const [dark, setDark] = useState(
-    () => localStorage.getItem('tt-theme') === 'dark'
-  )
+  const [dark, setDark] = useState(() => localStorage.getItem('tt-theme') === 'dark');
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
+  const [timeStr, setTimeStr] = useState('');
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
@@ -15,10 +16,44 @@ export default function Navbar() {
   }, [dark])
 
 
-  return (
-    <nav className='h-[var(--tt-navbar-h)] bg-tt-bg-card border-b border-tt-border shadow-[var(--tt-shadow-sm)] 
-    px-4 flex items-center justify-between sticky top-0 z-50'>
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY
+      if (currentY < 10) {
+        setVisible(true) 
+      } else if (currentY < lastScrollY.current) {
+        setVisible(true) 
+      } else {
+        setVisible(false) 
+      }
+      lastScrollY.current = currentY
+    }
 
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // TIMEEE
+  useEffect(() => {
+    const update = () => {
+      const now = new Date()
+      const date = now.toLocaleDateString([], { month: 'short', day: 'numeric' })
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
+      setTimeStr(`${date} · ${time}`)
+    }
+    update()
+    const interval = setInterval(update, 60000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+
+    <nav className={`h-[var(--tt-navbar-h)] bg-tt-bg-card border-b border-tt-border shadow-[var(--tt-shadow-sm)] 
+    px-4 flex items-center justify-between sticky top-0 z-50
+    transition-transform duration-300 ease-in-out
+    ${visible ? 'translate-y-0' : '-translate-y-full'}`}>
+
+      {/* Everything inside stays exactly the same */}
       {/* Left: Logo */}
       <div className='flex items-center gap-2.5'>
         <div className='w-7 h-7 rounded-lg bg-tt-primary flex items-center justify-center flex-shrink-0'>
@@ -34,8 +69,10 @@ export default function Navbar() {
 
       {/* Right */}
       <div className='flex items-center gap-2'>
+        <span className='text-xs font-medium text-tt-text-muted hidden sm:block '>
+          {timeStr}
+        </span>
 
-        {/* Dark mode toggle */}
         <button
           onClick={() => setDark(v => !v)}
           className='w-7 h-7 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
@@ -57,7 +94,6 @@ export default function Navbar() {
 
         <div className='w-px h-5 bg-tt-border' />
 
-        {/* User chip */}
         <div className='flex items-center gap-2 px-2.5 py-1 rounded-full bg-tt-bg-muted border border-tt-border'>
           <div className='w-5 h-5 rounded-full bg-tt-primary flex items-center justify-center text-white font-bold flex-shrink-0 text-[10px]'>
             {currentUser?.email?.[0].toUpperCase()}
@@ -76,8 +112,6 @@ export default function Navbar() {
 
         <div className='w-px h-5 bg-tt-border' />
 
-
-        {/* Sign out */}
         <button
           onClick={logout}
           className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
@@ -88,8 +122,6 @@ export default function Navbar() {
           </svg>
           Sign out
         </button>
-
-
       </div>
     </nav>
   )

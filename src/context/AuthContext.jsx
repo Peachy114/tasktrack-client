@@ -58,8 +58,8 @@ export function useAuth() {
 }
 
 async function fetchUserProfile(user) {
-  const token = await user.getIdToken(true); // force refresh to avoid expired tokens
-  return await userService.getMe(token);     // reuse service instead of raw fetch
+  const token = await user.getIdToken(true);
+  return await userService.getMe(token);     
 }
 
 export function AuthProvider({ children }) {
@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      setError(null); // reset error on every auth state change
+      setError(null);
 
       if (user) {
         try {
@@ -83,16 +83,15 @@ export function AuthProvider({ children }) {
         } catch (err) {
           console.error("Auth profile fetch failed:", err);
           setError(err.message);
-          setCurrentUser(null); // fail safe — treat as logged out
+          setCurrentUser(null);
         }
       } else {
         setCurrentUser(null);
       }
-
-      setLoading(false); // always runs, no more infinite loading
+      setLoading(false); 
     });
 
-    return unsub; // cleanup listener on unmount
+    return unsub; 
   }, []);
 
   const value = {
