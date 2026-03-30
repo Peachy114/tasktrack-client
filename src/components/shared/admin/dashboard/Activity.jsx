@@ -1,71 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import activityService from '@/services/activityServices'
-import { avatarCls } from '@/utils/helper'
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function formatTime(date) {
-  if (!date) return ''
-  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-}
-
-function formatDate(date) {
-  if (!date) return ''
-  const d = new Date(date)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-  if (d.toDateString() === today.toDateString()) return 'Today'
-  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
-}
-
-const STATUS_LABEL = {
-  in_progress: 'In Progress',
-  done:        'Done',
-  backlog:     'Pending',
-}
-
-const STATUS_BADGE = {
-  in_progress: 'bg-tt-progress-bg text-tt-progress-text',
-  done:        'bg-tt-done-bg text-tt-done-text',
-  backlog:     'bg-tt-backlog-bg text-tt-backlog-text',
-}
-
-const TYPE_META = {
-  task_created:   { badgeCls: 'bg-tt-indigo-light text-tt-indigo',  label: 'Created'  },
-  status_changed: { badgeCls: 'bg-tt-orange-light text-tt-orange',  label: 'Status'   },
-}
-
-function getLabel(activity) {
-  switch (activity.type) {
-    case 'task_created':   return { action: 'created',                                       target: activity.taskTitle }
-    case 'status_changed': return { action: STATUS_LABEL[activity.nextStatus] ?? activity.nextStatus, target: activity.taskTitle }
-    default:               return { action: 'did something', target: null }
-  }
-}
-
-function groupByDate(activities) {
-  const groups = []
-  let currentDate = null
-  activities.forEach(a => {
-    const label = formatDate(a.createdAt)
-    if (label !== currentDate) {
-      currentDate = label
-      groups.push({ type: 'divider', label })
-    }
-    groups.push({ type: 'item', data: a })
-  })
-  return groups
-}
+import {
+  avatarCls, formatTime, isToday,
+  STATUS_LABEL, STATUS_BADGE, TYPE_META,
+  getLabel, groupByDate, filterMatch
+} from '@/utils/helper'
 
 const FILTERS = ['All', 'Created', 'Status']
-
-function filterMatch(a, f) {
-  if (f === 'All')     return true
-  if (f === 'Created') return a.type === 'task_created'
-  if (f === 'Status')  return a.type === 'status_changed'
-  return true
-}
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 function ActivityIcon() {
@@ -98,29 +39,19 @@ function DateDivider({ label }) {
 }
 
 function ActivityRow({ activity }) {
-  const meta = TYPE_META[activity.type] ?? TYPE_META.task_created
-  const { action, target } = getLabel(activity)
-  const displayName = activity.userEmail
-    ? activity.userEmail.split('@')[0]
-    : 'Admin'
+  const meta        = TYPE_META[activity.type] ?? TYPE_META.task_created
+  const { target }  = getLabel(activity)
+  const displayName = activity.userEmail ? activity.userEmail.split('@')[0] : 'Admin'
   const statusBadge = activity.nextStatus ? STATUS_BADGE[activity.nextStatus] : null
 
   return (
-    <div className='flex items-start gap-2.5 py-2.5 px-3 rounded-2xl hover:bg-tt-bg-muted transition-colors duration-150 group'>
+    <div className='flex items-start gap-2.5 py-2.5 px-3 rounded-2xl hover:bg-tt-bg-muted transition-colors duration-150'>
       <Avatar email={activity.userEmail ?? 'admin'} />
-
       <div className='flex-1 min-w-0'>
-        {/* Name + Time on the same row */}
         <div className='flex items-center justify-between gap-2 mb-1'>
-          <span className='text-[11px] font-bold text-tt-text capitalize truncate'>
-            {displayName}
-          </span>
-          <span className='text-[10px] text-tt-text-hint flex-shrink-0'>
-            {formatTime(activity.createdAt)}
-          </span>
+          <span className='text-[11px] font-bold text-tt-text capitalize truncate'>{displayName}</span>
+          <span className='text-[10px] text-tt-text-hint flex-shrink-0'>{formatTime(activity.createdAt)}</span>
         </div>
-
-        {/* Action row */}
         <div className='flex items-center gap-1.5 flex-wrap'>
           {activity.type === 'task_created' ? (
             <>
@@ -176,6 +107,7 @@ export default function Activity() {
   const [activities,   setActivities]   = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
   const [loading,      setLoading]      = useState(true)
+  const [showOlder,    setShowOlder]    = useState(false)
   const prevIdsRef = useRef(new Set())
 
   useEffect(() => {
@@ -187,15 +119,18 @@ export default function Activity() {
     return () => unsubscribe()
   }, [])
 
-  const filtered  = activities.filter(a => filterMatch(a, activeFilter))
-  const grouped   = groupByDate(filtered)
-  const itemCount = filtered.length 
+  const filtered     = activities.filter(a => filterMatch(a, activeFilter))
+  const todayItems   = filtered.filter(a => isToday(a.createdAt))
+  const olderItems   = filtered.filter(a => !isToday(a.createdAt))
+  const visibleItems = showOlder ? filtered : todayItems
+  const grouped      = groupByDate(visibleItems)
+  const itemCount    = filtered.length
 
   return (
     <div className='py-6 h-96 max-w-7xl mx-auto overflow-auto'>
       <div className='bg-tt-bg-card rounded-2xl border border-tt-border h-full flex flex-col overflow-hidden'>
 
-        {/* ── Toolbar (matches AdminTask style) ── */}
+        {/* ── Toolbar ── */}
         <div className='flex items-center justify-between px-5 py-3 border-b border-tt-border bg-tt-bg-muted rounded-t-2xl'>
           <div className='flex items-center gap-2'>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className='text-tt-primary'>
@@ -236,7 +171,7 @@ export default function Activity() {
         </div>
 
         {/* ── Feed ── */}
-        <div className='flex-1 overflow-y-auto px-2 py-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-tt-border'>
+        <div className='flex-1 overflow-y-auto px-2 py-2'>
           {loading ? (
             <Skeleton />
           ) : itemCount === 0 ? (
@@ -254,6 +189,19 @@ export default function Activity() {
                 ) : (
                   <ActivityRow key={item.data.id} activity={item.data} />
                 )
+              )}
+
+              {/* 👇 See More / Hide button */}
+              {olderItems.length > 0 && (
+                <button
+                  onClick={() => setShowOlder(prev => !prev)}
+                  className='mt-2 mb-1 mx-3 text-[10px] font-bold text-tt-primary bg-tt-primary-light px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity'
+                >
+                  {showOlder
+                    ? `Hide older activities`
+                    : `See ${olderItems.length} older activit${olderItems.length !== 1 ? 'ies' : 'y'}`
+                  }
+                </button>
               )}
             </div>
           )}

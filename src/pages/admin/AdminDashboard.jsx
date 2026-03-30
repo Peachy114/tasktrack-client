@@ -1,34 +1,35 @@
-import '@/utils/chartSetup'
-import { useMemo } from 'react'
-import { taskService } from '../../services/taskServices'
-import { POLL_INTERVAL } from '@/utils/constants'
-import { useFirestoreTasks, useFirestoreUsers, usePolledData } from '@/hook/useDashboard'
-import StatCard           from '@/components/shared/admin/dashboard/StatCard'
-import ProgressRing       from '@/components/shared/admin/dashboard/ProgressRing'
-import TeamPanel          from '@/components/shared/admin/dashboard/TeamPanel'
-import TasksBarChart      from '@/components/shared/admin/dashboard/TasksBarChart'
-import CompletionTrendChart from '@/components/shared/admin/dashboard/CompletionTrendChart'
-import Activity           from '@/components/shared/admin/dashboard/Activity'
+import '@/utils/chartSetup';
+import { useMemo } from 'react';
+import { taskService } from '../../services/taskServices';
+import { POLL_INTERVAL } from '@/utils/constants';
+import { useFirestoreUsers, usePolledData } from '@/hook/useDashboard';
+import StatCard           from '@/components/shared/admin/dashboard/StatCard';
+import ProgressRing       from '@/components/shared/admin/dashboard/ProgressRing';
+import TeamPanel          from '@/components/shared/admin/dashboard/TeamPanel';
+import TasksBarChart      from '@/components/shared/admin/dashboard/TasksBarChart';
+import CompletionTrendChart from '@/components/shared/admin/dashboard/CompletionTrendChart';;
+import Activity           from '@/components/shared/admin/dashboard/Activity';
 
 export default function AdminDashboard() {
-  const liveTasks   = useFirestoreTasks()
-  const liveUsers   = useFirestoreUsers()
-  const polledTasks = usePolledData(taskService.getAll, POLL_INTERVAL)
+  const liveUsers   = useFirestoreUsers();
+  const polledStats  = usePolledData(taskService.getMonthlyStats, POLL_INTERVAL);
+  const polledSummary = usePolledData(taskService.getTaskStats, POLL_INTERVAL);
+
 
   const stats = useMemo(() => {
-    const total          = liveTasks.length
-    const doneTasks      = liveTasks.filter(t => t.status === 'done').length
-    const activeTasks    = liveTasks.filter(t => t.status === 'in_progress').length
-    const pendingTasks   = liveTasks.filter(t => t.status === 'backlog').length
-    const completionRate = total > 0 ? Math.round((doneTasks / total) * 100) : 0
+    const total          = polledSummary?.total          ?? 0
+    const doneTasks      = polledSummary?.completed      ?? 0
+    const activeTasks    = polledSummary?.inProgress     ?? 0
+    const pendingTasks   = polledSummary?.pending        ?? 0
+    const completionRate = polledSummary?.completionRate ?? 0
     const r    = 52
     const circ = 2 * Math.PI * r
     return {
-      total, doneTasks, activeTasks, pendingTasks, completionRate, r, circ,
-      doneOffset:     circ - (doneTasks / (total || 1)) * circ,
-      progressOffset: circ - ((doneTasks + activeTasks) / (total || 1)) * circ,
+        total, doneTasks, activeTasks, pendingTasks, completionRate, r, circ,
+        doneOffset:     circ - (doneTasks / (total || 1)) * circ,
+        progressOffset: circ - ((doneTasks + activeTasks) / (total || 1)) * circ,
     }
-  }, [liveTasks])
+  }, [polledSummary])
 
   // statCards uses stats values
   const statCards = [
@@ -81,8 +82,8 @@ export default function AdminDashboard() {
         </div>
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-5'>
-          <TasksBarChart tasks={polledTasks} />
-          <CompletionTrendChart tasks={polledTasks} />
+          <TasksBarChart stats={polledStats} />
+          <CompletionTrendChart stats={polledStats} />
         </div>
 
         <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-2'>
