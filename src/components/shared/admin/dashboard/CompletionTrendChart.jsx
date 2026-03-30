@@ -1,11 +1,11 @@
-import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
 import { C, chartDefaults } from '../../../../utils/constants'
-import { buildMonthlyData } from '../../../../utils/helper'
 import LiveBadge from './LiveBadge'
 
-export default function CompletionTrendChart({ tasks }) {
-  const { labels, inProgress, completed } = useMemo(() => buildMonthlyData(tasks), [tasks])
+export default function CompletionTrendChart({ stats }) {
+const labels     = stats?.labels     ?? []
+const inProgress = stats?.inProgress ?? []
+const completed  = stats?.completed  ?? []
 
   const data = {
     labels,

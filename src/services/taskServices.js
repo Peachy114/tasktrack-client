@@ -73,4 +73,23 @@ export const taskService = {
         if (!res.ok) throw new Error('Failed to update status.');
         return res.json();
     },
+
+    // GET /tasks/stats/monthly
+    getMonthlyStats: async (token) => {
+        const res = await fetch(`${API}/tasks/stats/monthly`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!res.ok) throw new Error('Failed to fetch monthly stats')
+        return res.json()
+    },
+    // GET /tasks/stats/summary
+    getTaskStats: async (token) => {
+    const res = await fetch(`${API}/tasks/stats/summary`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+    if (!res.ok) throw new Error('Failed to fetch task stats')
+    return res.json()
+},
+
+
 }

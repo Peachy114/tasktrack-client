@@ -1,12 +1,13 @@
-import { useMemo } from 'react'
 import { Bar } from 'react-chartjs-2'
 import { C, chartDefaults } from '../../../../utils/constants'
-import { buildMonthlyData } from '../../../../utils/helper'
 import LiveBadge from './LiveBadge'
 import ChartLegend from './ChartLegend'
 
-export default function TasksBarChart({ tasks }) {
-  const { labels, pending, inProgress, completed } = useMemo(() => buildMonthlyData(tasks), [tasks])
+export default function TasksBarChart({ stats }) {
+  const labels     = stats?.labels     ?? []
+  const pending    = stats?.pending    ?? []
+  const inProgress = stats?.inProgress ?? []
+  const completed  = stats?.completed  ?? []
 
   const data = {
     labels,
