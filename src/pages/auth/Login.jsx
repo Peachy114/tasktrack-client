@@ -45,27 +45,27 @@ export default function Login() {
     <div className='min-h-screen bg-tt-bg flex items-center justify-center p-6'>
       <div className='w-full max-w-md flex flex-col gap-6'>
 
-        {/* Header */}
-        <div className='text-center'>
-          <div className='w-11 h-11 rounded-xl bg-tt-primary flex items-center justify-center mx-auto mb-4'>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <rect x="3" y="9" width="14" height="10" rx="2" stroke="#ffffff" strokeWidth="1.5"/>
-              <path d="M7 9V6a3 3 0 016 0v3" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <p className='text-xs font-semibold tracking-widest uppercase text-tt-text-hint mb-1'>
-            Welcome back
-          </p>
-          <h1 className='text-2xl font-bold text-tt-primary'>
-            Sign in to your account
-          </h1>
-          <p className='text-sm text-tt-text-muted mt-1.5'>
-            Enter your credentials to continue
-          </p>
-        </div>
-
         {/* Card */}
-        <div className='bg-tt-bg-card border border-tt-border rounded-2xl p-7 flex flex-col gap-4'>
+        <div className='bg-tt-bg-card border border-tt-border rounded-3xl p-7 flex flex-col gap-4'>
+
+          {/* Header */}
+          <div className='text-center mb-5'>
+            <div className='w-11 h-11 rounded-xl bg-tt-primary flex items-center justify-center mx-auto mb-4'>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="9" width="14" height="10" rx="2" stroke="#ffffff" strokeWidth="1.5"/>
+                <path d="M7 9V6a3 3 0 016 0v3" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <p className='text-xs font-semibold tracking-widest uppercase text-tt-text-hint mb-1'>
+              Welcome back
+            </p>
+            <h1 className='text-2xl font-bold text-tt-primary'>
+              Sign in to your account
+            </h1>
+            <p className='text-sm text-tt-text-muted mt-1.5'>
+              Enter your credentials to continue
+            </p>
+        </div>
 
           {/* Error */}
           {error && (

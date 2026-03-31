@@ -50,6 +50,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { userService } from "../services/userService";
+import LoadingPage from "@/components/shared/Loading";
 
 const AuthContext = createContext();
 
@@ -102,7 +103,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ?  <LoadingPage /> : children}
     </AuthContext.Provider>
   );
 }

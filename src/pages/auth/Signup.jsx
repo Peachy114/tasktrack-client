@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { auth } from "../../firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth"
@@ -46,26 +47,27 @@ export default function SignUp() {
     <div className='min-h-screen bg-tt-bg flex items-center justify-center p-6'>
       <div className='w-full max-w-md flex flex-col gap-6'>
 
-        {/* Header */}
-        <div className='text-center'>
-          <div className='w-11 h-11 rounded-xl bg-tt-primary flex items-center justify-center mx-auto mb-4'>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2a4 4 0 100 8 4 4 0 000-8zM4 14c0-2.5 2.686-4 6-4s6 1.5 6 4v1H4v-1z" fill="#ffffff"/>
-            </svg>
-          </div>
-          <p className='text-xs font-semibold tracking-widest uppercase text-tt-text-hint mb-1'>
-            Get started
-          </p>
-          <h1 className='text-2xl font-bold text-tt-primary'>
-            Create your account
-          </h1>
-          <p className='text-sm text-tt-text-muted mt-1.5'>
-            Join the team and start managing tasks
-          </p>
-        </div>
 
         {/* Card */}
-        <div className='bg-tt-bg-card border border-tt-border rounded-2xl p-7 flex flex-col gap-4'>
+        <div className='bg-tt-bg-card border border-tt-border rounded-3xl p-7 flex flex-col gap-4'>
+
+          {/* Header */}
+          <div className='text-center mb-5'>
+            <div className='w-11 h-11 rounded-xl bg-tt-primary flex items-center justify-center mx-auto mb-4'>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2a4 4 0 100 8 4 4 0 000-8zM4 14c0-2.5 2.686-4 6-4s6 1.5 6 4v1H4v-1z" fill="#ffffff"/>
+              </svg>
+            </div>
+            <p className='text-xs font-semibold tracking-widest uppercase text-tt-text-hint mb-1'>
+              Get started
+            </p>
+            <h1 className='text-2xl font-bold text-tt-primary'>
+              Create your account
+            </h1>
+            <p className='text-sm text-tt-text-muted mt-1.5'>
+              Join the team and start managing tasks
+            </p>
+          </div>
 
           {/* Error */}
           {error && (

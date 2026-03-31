@@ -84,12 +84,26 @@ export const taskService = {
     },
     // GET /tasks/stats/summary
     getTaskStats: async (token) => {
-    const res = await fetch(`${API}/tasks/stats/summary`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-    if (!res.ok) throw new Error('Failed to fetch task stats')
-    return res.json()
-},
+        const res = await fetch(`${API}/tasks/stats/summary`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        if (!res.ok) throw new Error('Failed to fetch task stats')
+        return res.json()
+    },
+
+    edit: async (token, taskId, data) => {
+        const res = await fetch(`${API}/tasks/${taskId}/edit`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        if (!res.ok) throw new Error('Failed to edit task')
+        return res.json()
+    },
+        
 
 
 }
