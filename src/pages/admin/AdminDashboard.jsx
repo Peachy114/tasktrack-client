@@ -3,18 +3,17 @@ import { useMemo } from 'react';
 import { taskService } from '../../services/taskServices';
 import { POLL_INTERVAL } from '@/utils/constants';
 import { useFirestoreUsers, usePolledData } from '@/hook/useDashboard';
-import StatCard           from '@/components/shared/admin/dashboard/StatCard';
-import ProgressRing       from '@/components/shared/admin/dashboard/ProgressRing';
-import TeamPanel          from '@/components/shared/admin/dashboard/TeamPanel';
-import TasksBarChart      from '@/components/shared/admin/dashboard/TasksBarChart';
-import CompletionTrendChart from '@/components/shared/admin/dashboard/CompletionTrendChart';;
-import Activity           from '@/components/shared/admin/dashboard/Activity';
+import StatCard             from '@/components/shared/admin/dashboard/StatCard';
+import ProgressRing         from '@/components/shared/admin/dashboard/ProgressRing';
+import TeamPanel            from '@/components/shared/admin/dashboard/TeamPanel';
+import TasksBarChart        from '@/components/shared/admin/dashboard/TasksBarChart';
+import CompletionTrendChart from '@/components/shared/admin/dashboard/CompletionTrendChart';
+import Activity             from '@/components/shared/admin/dashboard/Activity';
 
 export default function AdminDashboard() {
-  const liveUsers   = useFirestoreUsers();
-  const polledStats  = usePolledData(taskService.getMonthlyStats, POLL_INTERVAL);
-  const polledSummary = usePolledData(taskService.getTaskStats, POLL_INTERVAL);
-
+  const liveUsers      = useFirestoreUsers();
+  const polledStats    = usePolledData(taskService.getMonthlyStats, POLL_INTERVAL);
+  const polledSummary  = usePolledData(taskService.getTaskStats, POLL_INTERVAL);
 
   const stats = useMemo(() => {
     const total          = polledSummary?.total          ?? 0
@@ -25,13 +24,12 @@ export default function AdminDashboard() {
     const r    = 52
     const circ = 2 * Math.PI * r
     return {
-        total, doneTasks, activeTasks, pendingTasks, completionRate, r, circ,
-        doneOffset:     circ - (doneTasks / (total || 1)) * circ,
-        progressOffset: circ - ((doneTasks + activeTasks) / (total || 1)) * circ,
+      total, doneTasks, activeTasks, pendingTasks, completionRate, r, circ,
+      doneOffset:     circ - (doneTasks / (total || 1)) * circ,
+      progressOffset: circ - ((doneTasks + activeTasks) / (total || 1)) * circ,
     }
   }, [polledSummary])
 
-  // statCards uses stats values
   const statCards = [
     {
       label: 'Total Tasks', value: stats.total, sub: 'All tasks',
@@ -69,25 +67,45 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className='min-h-screen flex flex-col gap-4 pb-20'>
-      <div className='px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full bg-(image:--gradient-tt-bg) rounded-2xl mt-10'>
-        <Activity />
+    <div className='min-h-screen pb-28 p-0'>
 
-        {/*  map over statCards, spread each object as props into StatCard */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-5'>
-          {statCards.map((card, i) => <StatCard key={i} {...card} />)}
+      {/* HEADER */}
+      <div className='px-4 sm:px-6 pt-8 pb-4'>
+        <h3 className='text-tt-text-muted text-sm'>Overview</h3>
+        <h1 className='text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-white'>
+          Dashboard
+        </h1>
+      </div>
+
+      {/* MAIN CONTENT — single column on mobile, side-by-side on lg+ */}
+      <div className='flex flex-col lg:grid lg:grid-cols-3 gap-0'>
+
+        {/* Activity panel — full width on mobile, 1 col on lg */}
+        <div className='px-4 sm:px-6 py-4 w-full'>
+          <Activity />
         </div>
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-5'>
-          <TasksBarChart stats={polledStats} />
-          <CompletionTrendChart stats={polledStats} />
-        </div>
+        {/* Right content — full width on mobile, 2 cols on lg */}
+        <div className='px-4 sm:px-6 py-4 w-full lg:col-span-2'>
 
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-2'>
-          <ProgressRing {...stats} />
-          <TeamPanel users={liveUsers} />
-        </div>
+          {/* Stat cards — 1 col mobile, 3 col lg */}
+          <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4'>
+            {statCards.map((card, i) => <StatCard key={i} {...card} />)}
+          </div>
 
+          {/* Charts — 1 col mobile, 2 col lg */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4'>
+            <TasksBarChart stats={polledStats} />
+            <CompletionTrendChart stats={polledStats} />
+          </div>
+
+          {/* Progress + Team — 1 col mobile, 2 col lg */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+            <ProgressRing {...stats} />
+            <TeamPanel users={liveUsers} />
+          </div>
+
+        </div>
       </div>
     </div>
   )
