@@ -25,7 +25,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="*" element={<NotFound />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -57,6 +56,9 @@ function App() {
               </EmployeeLayout>
             </ProtectedRoute>
           }/>
+
+          {/* NOT FOUND */}
+          <Route path="*" element={<NotFound />} />
 
         </Routes>
       </BrowserRouter>

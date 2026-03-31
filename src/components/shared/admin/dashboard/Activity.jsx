@@ -12,7 +12,8 @@ const FILTERS = ['All', 'Created', 'Status']
 function ActivityIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }
@@ -91,7 +92,8 @@ function Skeleton() {
     <div className='flex flex-col gap-1'>
       {[0.9, 0.7, 0.85, 0.6].map((op, i) => (
         <div key={i} className='flex gap-2.5 items-start px-3 py-2.5'>
-          <div className='w-7 h-7 rounded-xl bg-tt-bg-muted animate-pulse flex-shrink-0' style={{ animationDelay: `${i * 0.15}s` }} />
+          <div className='w-7 h-7 rounded-xl bg-tt-bg-muted animate-pulse flex-shrink-0'
+            style={{ animationDelay: `${i * 0.15}s` }} />
           <div className='flex-1 flex flex-col gap-1.5'>
             <div className='h-3 rounded-full bg-tt-bg-muted animate-pulse w-1/3' style={{ opacity: op }} />
             <div className='h-3 rounded-full bg-tt-bg-muted animate-pulse w-2/3' style={{ opacity: op * 0.7 }} />
@@ -127,47 +129,67 @@ export default function Activity() {
   const itemCount    = filtered.length
 
   return (
-    <div className='py-6 h-96 max-w-7xl mx-auto overflow-auto'>
+    <div className='h-[30rem] sm:h-[56rem] max-w-7xl mx-auto overflow-auto'>
       <div className='bg-tt-bg-card rounded-2xl border border-tt-border h-full flex flex-col overflow-hidden'>
 
         {/* ── Toolbar ── */}
-        <div className='flex items-center justify-between px-5 py-3 border-b border-tt-border bg-tt-bg-muted rounded-t-2xl'>
-          <div className='flex items-center gap-2'>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className='text-tt-primary'>
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <p className='text-sm font-semibold text-tt-primary'>Activity</p>
-            <span className='text-xs px-2 py-0.5 rounded-full font-medium bg-tt-border text-tt-primary'>
-              {itemCount} events
-            </span>
+        <div className='flex flex-col gap-2 px-4 py-3 border-b border-tt-border bg-tt-bg-muted rounded-t-2xl
+                        sm:flex-row sm:items-center sm:justify-between sm:gap-0'>
+
+          {/* Row 1: Title + Live dot */}
+          <div className='flex items-center justify-between sm:justify-start sm:gap-2'>
+            <div className='flex items-center gap-2'>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className='text-tt-primary flex-shrink-0'>
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <p className='text-sm font-semibold text-tt-primary'>Activity</p>
+              <span className='text-xs px-2 py-0.5 rounded-full font-medium bg-tt-border text-tt-primary'>
+                {itemCount} events
+              </span>
+            </div>
+
+            {/* Live dot — right side on mobile, hidden on sm (shown separately) */}
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold sm:hidden ${
+              loading
+                ? 'bg-tt-bg-muted border-tt-border text-tt-text-hint'
+                : 'bg-tt-done-bg border-tt-done-bg text-tt-done-text'
+            }`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-tt-text-hint' : 'bg-tt-done-text animate-pulse'}`} />
+              {loading ? 'Loading' : 'Live'}
+            </div>
           </div>
 
-          {/* Filter tabs */}
-          <div className='flex items-center gap-1 p-1 bg-tt-bg-card rounded-xl border border-tt-border'>
-            {FILTERS.map(f => (
-              <button
-                key={f}
-                onClick={() => setActiveFilter(f)}
-                className={`text-[10px] font-bold px-3 py-1 rounded-lg border-none cursor-pointer transition-all duration-150 ${
-                  activeFilter === f
-                    ? 'bg-tt-primary text-white shadow-sm'
-                    : 'bg-transparent text-tt-text-muted hover:text-tt-text'
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+          {/* Row 2: Filters + Live dot (sm+) */}
+          <div className='flex items-center justify-between sm:justify-end gap-2'>
+            {/* Filter tabs */}
+            <div className='flex items-center gap-1 p-1 bg-tt-bg-card rounded-xl border border-tt-border'>
+              {FILTERS.map(f => (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border-none cursor-pointer transition-all duration-150 ${
+                    activeFilter === f
+                      ? 'bg-tt-primary text-white shadow-sm'
+                      : 'bg-transparent text-tt-text-muted hover:text-tt-text'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* Live dot — only on sm+ */}
+            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold ${
+              loading
+                ? 'bg-tt-bg-muted border-tt-border text-tt-text-hint'
+                : 'bg-tt-done-bg border-tt-done-bg text-tt-done-text'
+            }`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-tt-text-hint' : 'bg-tt-done-text animate-pulse'}`} />
+              {loading ? 'Loading' : 'Live'}
+            </div>
           </div>
 
-          {/* Live dot */}
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold transition-all ${
-            loading
-              ? 'bg-tt-bg-muted border-tt-border text-tt-text-hint'
-              : 'bg-tt-done-bg border-tt-done-bg text-tt-done-text'
-          }`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-tt-text-hint' : 'bg-tt-done-text animate-pulse'}`} />
-            {loading ? 'Loading' : 'Live'}
-          </div>
         </div>
 
         {/* ── Feed ── */}
@@ -183,7 +205,7 @@ export default function Activity() {
             </div>
           ) : (
             <div className='flex flex-col'>
-              {grouped.map((item, i) =>
+              {grouped.map((item) =>
                 item.type === 'divider' ? (
                   <DateDivider key={`divider-${item.label}`} label={item.label} />
                 ) : (
@@ -191,14 +213,14 @@ export default function Activity() {
                 )
               )}
 
-              {/* 👇 See More / Hide button */}
               {olderItems.length > 0 && (
                 <button
                   onClick={() => setShowOlder(prev => !prev)}
-                  className='mt-2 mb-1 mx-3 text-[10px] font-bold text-tt-primary bg-tt-primary-light px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity'
+                  className='mt-2 mb-1 mx-3 text-[10px] font-bold text-tt-primary bg-tt-primary-light
+                    px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity'
                 >
                   {showOlder
-                    ? `Hide older activities`
+                    ? 'Hide older activities'
                     : `See ${olderItems.length} older activit${olderItems.length !== 1 ? 'ies' : 'y'}`
                   }
                 </button>
@@ -209,13 +231,14 @@ export default function Activity() {
 
         {/* ── Footer ── */}
         {!loading && itemCount > 0 && (
-          <div className='px-5 py-2.5 border-t border-tt-border bg-tt-bg-muted rounded-b-2xl flex items-center justify-between'>
+          <div className='px-4 py-2.5 border-t border-tt-border bg-tt-bg-muted rounded-b-2xl flex items-center justify-between'>
             <span className='text-[10px] font-semibold text-tt-text-hint bg-tt-bg-card border border-tt-border px-2.5 py-0.5 rounded-full'>
               {itemCount} event{itemCount !== 1 ? 's' : ''}
             </span>
             <span className='text-[10px] text-tt-text-hint font-medium'>Real-time updates</span>
           </div>
         )}
+
       </div>
     </div>
   )
