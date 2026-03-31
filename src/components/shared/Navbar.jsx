@@ -73,6 +73,7 @@ export default function Navbar() {
           {timeStr}
         </span>
 
+        {/* DARK MODE TOGGLE */}
         <button
           onClick={() => setDark(v => !v)}
           className='w-7 h-7 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
@@ -94,6 +95,7 @@ export default function Navbar() {
 
         <div className='w-px h-5 bg-tt-border' />
 
+          {/* User Info */}
         <div className='flex items-center gap-2 px-2.5 py-1 rounded-full bg-tt-bg-muted border border-tt-border'>
           <div className='w-5 h-5 rounded-full bg-tt-primary flex items-center justify-center text-white font-bold flex-shrink-0 text-[10px]'>
             {currentUser?.email?.[0].toUpperCase()}
@@ -112,6 +114,7 @@ export default function Navbar() {
 
         <div className='w-px h-5 bg-tt-border' />
 
+          {/* Sign out Button */}
         <button
           onClick={logout}
           className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'

@@ -70,10 +70,7 @@ export default function AdminDashboard() {
 
   return (
     <div className='min-h-screen flex flex-col gap-4 pb-20'>
-      <div className='px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full'>
-
-        
-
+      <div className='px-4 sm:px-6 py-6 max-w-7xl mx-auto w-full bg-(image:--gradient-tt-bg) rounded-2xl mt-10'>
         <Activity />
 
         {/*  map over statCards, spread each object as props into StatCard */}

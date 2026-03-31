@@ -145,6 +145,7 @@ export default function AdminTasks() {
                   onSelectUser={handleSelectUser} 
                   onAssign={handleAssign}
                   onToggleExpand={toggleExpand}
+                  onRefetch={fetchTasks}
                 />
               ))}
             </div>
@@ -163,6 +164,7 @@ export default function AdminTasks() {
                   onSelectUser={handleSelectUser} 
                   onAssign={handleAssign}
                   onToggleExpand={toggleExpand}
+                  onRefetch={fetchTasks}
                 />
               ))}
             </div>

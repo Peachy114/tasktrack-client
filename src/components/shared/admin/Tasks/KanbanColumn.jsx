@@ -2,7 +2,7 @@ import TaskCard from './TaskCard'
 
 const MAX_VISIBLE = 5
 
-export default function KanbanColumn({ col, tasks, users, selectedUser, expanded, hasFilters, addingTo, onSelectUser, onAssign, onToggleExpand, isMobile = false, ci = 0 }) {
+export default function KanbanColumn({ col, tasks, users, selectedUser, expanded, hasFilters, addingTo, onSelectUser, onAssign, onToggleExpand, onRefetch, isMobile = false, ci = 0 }) {
   const isExpanded = expanded[col.key]
   const visible    = isExpanded ? tasks : tasks.slice(0, MAX_VISIBLE)
   const remaining  = tasks.length - MAX_VISIBLE
@@ -27,6 +27,7 @@ export default function KanbanColumn({ col, tasks, users, selectedUser, expanded
             selectedUser={selectedUser?.[task.id] || ''}
             onSelectUser={onSelectUser}
             onAssign={onAssign}
+            onRefetch={onRefetch}
           />
         ))}
 
