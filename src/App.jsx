@@ -33,20 +33,14 @@ function App() {
           <Route path='/admin' element={
             <AdminRoute>
               <AdminLayout>
-                <AdminDashboard />
               </AdminLayout>
             </AdminRoute>
-          }
+          }> 
+            <Route index element={<AdminDashboard />} />
+            <Route path='tasks' element={<AdminTasks />} />
+          </Route>
 
-          />
-          <Route path='/admin/tasks' element={
-            <AdminRoute>
-              <AdminLayout>
-                <AdminTasks />
-              </AdminLayout>
-            </AdminRoute>
-          }
-          />
+
 
           {/* Employee Routes */}
           <Route path='/dashboard' element={

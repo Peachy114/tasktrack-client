@@ -1,13 +1,16 @@
 import { AV_COLORS } from './constants'
+import { STATUS_LABEL } from './constants'
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
+//Activity.jsx + TeamModal.jsx
 export function avatarCls(email = '') {
   let hash = 0
   for (let i = 0; i < email.length; i++) hash = email.charCodeAt(i) + ((hash << 5) - hash)
   return AV_COLORS[Math.abs(hash) % AV_COLORS.length]
 }
 
-// ── Activity Helpers ──────────────────────────────────────────────────────────
+// ── Activity Helpers BELOW ──────────────────────────────────────────────────────────
+//Activity.jsx
 export function formatTime(date) {
   if (!date) return ''
   return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
@@ -24,27 +27,12 @@ export function formatDate(date) {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' })
 }
 
+//Activity.jsx + TeamModal.jsx
 export function isToday(date) {
   if (!date) return false
   return new Date(date).toDateString() === new Date().toDateString()
 }
 
-export const STATUS_LABEL = {
-  in_progress: 'In Progress',
-  done:        'Done',
-  backlog:     'Pending',
-}
-
-export const STATUS_BADGE = {
-  in_progress: 'bg-tt-progress-bg text-tt-progress-text',
-  done:        'bg-tt-done-bg text-tt-done-text',
-  backlog:     'bg-tt-backlog-bg text-tt-backlog-text',
-}
-
-export const TYPE_META = {
-  task_created:   { badgeCls: 'bg-tt-indigo-light text-tt-indigo',  label: 'Created' },
-  status_changed: { badgeCls: 'bg-tt-orange-light text-tt-orange',  label: 'Status'  },
-}
 
 export function getLabel(activity) {
   switch (activity.type) {

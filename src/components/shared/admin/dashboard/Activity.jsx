@@ -1,102 +1,69 @@
 import React, { useState, useEffect, useRef } from 'react'
 import activityService from '@/services/activityServices'
-import {
-  avatarCls, formatTime, isToday,
-  STATUS_LABEL, STATUS_BADGE, TYPE_META,
-  getLabel, groupByDate, filterMatch
-} from '@/utils/helper'
+import { formatTime, isToday, getLabel, groupByDate, filterMatch } from '@/utils/helper'
+import { STATUS_LABEL } from '@/utils/constants'
 
 const FILTERS = ['All', 'Created', 'Status']
 
-// ── Icons ─────────────────────────────────────────────────────────────────────
-function ActivityIcon() {
+const DOT_COLOR = {
+  task_created:   'bg-button-primary',
+  status_changed: 'bg-success',
+}
+
+function ActivityDot({ type }) {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"
-        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <div className="flex flex-col items-center pt-[5px]">
+      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${DOT_COLOR[type] ?? 'bg-text-gray'}`} />
+    </div>
   )
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
-function Avatar({ email = 'A' }) {
+function ActivityRow({ activity }) {
+  const { target } = getLabel(activity)
+  const displayName = activity.userEmail
+    ? activity.userEmail.split('@')[0]
+    : 'Admin'
+
+  const actionText =
+    activity.type === 'task_created'
+      ? `created ${target}`
+      : `${STATUS_LABEL[activity.nextStatus] ?? activity.nextStatus} ${target}`
+
   return (
-    <div className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-extrabold flex-shrink-0 ${avatarCls(email)}`}>
-      {(email[0] ?? 'A').toUpperCase()}
+    <div className="flex items-center gap-3 py-2.5 border-b border-border-primary last:border-0">
+      <ActivityDot type={activity.type} />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-text-gray leading-snug truncate">
+          <span className="font-semibold text-text-primary">{displayName}</span>{' '}
+          {actionText}
+        </p>
+        <p className="text-[11px] text-text-gray mt-0.5">
+          {formatTime(activity.createdAt)}
+        </p>
+      </div>
     </div>
   )
 }
 
 function DateDivider({ label }) {
   return (
-    <div className='flex items-center gap-2 my-2'>
-      <div className='flex-1 h-px bg-tt-border' />
-      <span className='text-[9px] font-bold tracking-widest uppercase text-tt-text-hint bg-tt-bg-muted border border-tt-border px-2.5 py-0.5 rounded-full'>
-        {label}
-      </span>
-      <div className='flex-1 h-px bg-tt-border' />
-    </div>
-  )
-}
-
-function ActivityRow({ activity }) {
-  const meta        = TYPE_META[activity.type] ?? TYPE_META.task_created
-  const { target }  = getLabel(activity)
-  const displayName = activity.userEmail ? activity.userEmail.split('@')[0] : 'Admin'
-  const statusBadge = activity.nextStatus ? STATUS_BADGE[activity.nextStatus] : null
-
-  return (
-    <div className='flex items-start gap-2.5 py-2.5 px-3 rounded-2xl hover:bg-tt-bg-muted transition-colors duration-150'>
-      <Avatar email={activity.userEmail ?? 'admin'} />
-      <div className='flex-1 min-w-0'>
-        <div className='flex items-center justify-between gap-2 mb-1'>
-          <span className='text-[11px] font-bold text-tt-text capitalize truncate'>{displayName}</span>
-          <span className='text-[10px] text-tt-text-hint flex-shrink-0'>{formatTime(activity.createdAt)}</span>
-        </div>
-        <div className='flex items-center gap-1.5 flex-wrap'>
-          {activity.type === 'task_created' ? (
-            <>
-              <span className='text-[10px] text-tt-text-muted'>Created</span>
-              {target && (
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full truncate max-w-[120px] inline-block ${meta.badgeCls}`}>
-                  {target}
-                </span>
-              )}
-            </>
-          ) : (
-            <>
-              <span className='text-[10px] text-tt-text-muted'>Marked</span>
-              {target && (
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full truncate max-w-[120px] inline-block ${meta.badgeCls}`}>
-                  {target}
-                </span>
-              )}
-              {statusBadge && (
-                <>
-                  <span className='text-[10px] text-tt-text-hint'>as</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusBadge}`}>
-                    {STATUS_LABEL[activity.nextStatus] ?? activity.nextStatus}
-                  </span>
-                </>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+    <div className="flex items-center gap-2 my-2">
+      <div className="flex-1 h-px bg-border-primary" />
+      <span className="text-[11px] text-text-gray">{label}</span>
+      <div className="flex-1 h-px bg-border-primary" />
     </div>
   )
 }
 
 function Skeleton() {
   return (
-    <div className='flex flex-col gap-1'>
-      {[0.9, 0.7, 0.85, 0.6].map((op, i) => (
-        <div key={i} className='flex gap-2.5 items-start px-3 py-2.5'>
-          <div className='w-7 h-7 rounded-xl bg-tt-bg-muted animate-pulse flex-shrink-0'
-            style={{ animationDelay: `${i * 0.15}s` }} />
-          <div className='flex-1 flex flex-col gap-1.5'>
-            <div className='h-3 rounded-full bg-tt-bg-muted animate-pulse w-1/3' style={{ opacity: op }} />
-            <div className='h-3 rounded-full bg-tt-bg-muted animate-pulse w-2/3' style={{ opacity: op * 0.7 }} />
+    <div className="flex flex-col">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="flex gap-3 items-start py-[9px] border-b border-border-primary last:border-0">
+          <div className="w-2 h-2 rounded-full bg-border-primary animate-pulse mt-[5px] flex-shrink-0" />
+          <div className="flex-1 flex flex-col gap-[6px]">
+            <div className="h-[9px] rounded-full bg-border-primary animate-pulse w-3/4" />
+            <div className="h-[9px] rounded-full bg-border-primary animate-pulse w-2/5" />
           </div>
         </div>
       ))}
@@ -104,12 +71,10 @@ function Skeleton() {
   )
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
 export default function Activity() {
   const [activities,   setActivities]   = useState([])
   const [activeFilter, setActiveFilter] = useState('All')
   const [loading,      setLoading]      = useState(true)
-  const [showOlder,    setShowOlder]    = useState(false)
   const prevIdsRef = useRef(new Set())
 
   useEffect(() => {
@@ -121,124 +86,45 @@ export default function Activity() {
     return () => unsubscribe()
   }, [])
 
-  const filtered     = activities.filter(a => filterMatch(a, activeFilter))
-  const todayItems   = filtered.filter(a => isToday(a.createdAt))
-  const olderItems   = filtered.filter(a => !isToday(a.createdAt))
-  const visibleItems = showOlder ? filtered : todayItems
-  const grouped      = groupByDate(visibleItems)
-  const itemCount    = filtered.length
+  const filtered = activities.filter(a => filterMatch(a, activeFilter))
+  const visible  = filtered.slice(0, 10)
+  const grouped  = groupByDate(visible)
 
   return (
-    <div className='h-[30rem] sm:h-[56rem] max-w-7xl mx-auto overflow-auto'>
-      <div className='bg-tt-bg-card rounded-2xl border border-tt-border h-full flex flex-col overflow-hidden'>
+    <div className="bg-bg-primary border border-border-primary rounded-2xl px-5 py-4 h-full">
 
-        {/* ── Toolbar ── */}
-        <div className='flex flex-col gap-2 px-4 py-3 border-b border-tt-border bg-tt-bg-muted rounded-t-2xl
-                        sm:flex-row sm:items-center sm:justify-between sm:gap-0'>
+      <p className="text-sm font-semibold text-text-primary mb-3">Recent activity</p>
 
-          {/* Row 1: Title + Live dot */}
-          <div className='flex items-center justify-between sm:justify-start sm:gap-2'>
-            <div className='flex items-center gap-2'>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className='text-tt-primary flex-shrink-0'>
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"
-                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <p className='text-sm font-semibold text-tt-primary'>Activity</p>
-              <span className='text-xs px-2 py-0.5 rounded-full font-medium bg-tt-border text-tt-primary'>
-                {itemCount} events
-              </span>
-            </div>
+      <div className="flex bg-bg-page rounded-xl p-[3px] gap-[2px] mb-4">
+        {FILTERS.map(f => (
+          <button
+            key={f}
+            onClick={() => setActiveFilter(f)}
+            className={`flex-1 py-1.5 px-2 rounded-[9px] text-[11px] font-medium transition-all border-none cursor-pointer ${
+              activeFilter === f
+                ? 'bg-bg-primary text-text-primary'
+                : 'text-text-gray hover:text-text-primary bg-transparent'
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
 
-            {/* Live dot — right side on mobile, hidden on sm (shown separately) */}
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold sm:hidden ${
-              loading
-                ? 'bg-tt-bg-muted border-tt-border text-tt-text-hint'
-                : 'bg-tt-done-bg border-tt-done-bg text-tt-done-text'
-            }`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-tt-text-hint' : 'bg-tt-done-text animate-pulse'}`} />
-              {loading ? 'Loading' : 'Live'}
-            </div>
-          </div>
-
-          {/* Row 2: Filters + Live dot (sm+) */}
-          <div className='flex items-center justify-between sm:justify-end gap-2'>
-            {/* Filter tabs */}
-            <div className='flex items-center gap-1 p-1 bg-tt-bg-card rounded-xl border border-tt-border'>
-              {FILTERS.map(f => (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border-none cursor-pointer transition-all duration-150 ${
-                    activeFilter === f
-                      ? 'bg-tt-primary text-white shadow-sm'
-                      : 'bg-transparent text-tt-text-muted hover:text-tt-text'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-
-            {/* Live dot — only on sm+ */}
-            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-bold ${
-              loading
-                ? 'bg-tt-bg-muted border-tt-border text-tt-text-hint'
-                : 'bg-tt-done-bg border-tt-done-bg text-tt-done-text'
-            }`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${loading ? 'bg-tt-text-hint' : 'bg-tt-done-text animate-pulse'}`} />
-              {loading ? 'Loading' : 'Live'}
-            </div>
-          </div>
-
-        </div>
-
-        {/* ── Feed ── */}
-        <div className='flex-1 overflow-y-auto px-2 py-2'>
-          {loading ? (
-            <Skeleton />
-          ) : itemCount === 0 ? (
-            <div className='flex flex-col items-center justify-center h-44 gap-2'>
-              <div className='w-10 h-10 rounded-2xl bg-tt-bg-muted text-tt-text-hint flex items-center justify-center'>
-                <ActivityIcon />
-              </div>
-              <p className='text-xs text-tt-text-hint font-medium'>No activity yet</p>
-            </div>
-          ) : (
-            <div className='flex flex-col'>
-              {grouped.map((item) =>
-                item.type === 'divider' ? (
-                  <DateDivider key={`divider-${item.label}`} label={item.label} />
-                ) : (
-                  <ActivityRow key={item.data.id} activity={item.data} />
-                )
-              )}
-
-              {olderItems.length > 0 && (
-                <button
-                  onClick={() => setShowOlder(prev => !prev)}
-                  className='mt-2 mb-1 mx-3 text-[10px] font-bold text-tt-primary bg-tt-primary-light
-                    px-3 py-1.5 rounded-full hover:opacity-80 transition-opacity'
-                >
-                  {showOlder
-                    ? 'Hide older activities'
-                    : `See ${olderItems.length} older activit${olderItems.length !== 1 ? 'ies' : 'y'}`
-                  }
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* ── Footer ── */}
-        {!loading && itemCount > 0 && (
-          <div className='px-4 py-2.5 border-t border-tt-border bg-tt-bg-muted rounded-b-2xl flex items-center justify-between'>
-            <span className='text-[10px] font-semibold text-tt-text-hint bg-tt-bg-card border border-tt-border px-2.5 py-0.5 rounded-full'>
-              {itemCount} event{itemCount !== 1 ? 's' : ''}
-            </span>
-            <span className='text-[10px] text-tt-text-hint font-medium'>Real-time updates</span>
-          </div>
+      <div className="overflow-y-auto max-h-[260px] pr-1 flex flex-col gap-0.5">
+        {loading ? (
+          <Skeleton />
+        ) : filtered.length === 0 ? (
+          <p className="text-xs text-text-gray py-2">No activity yet.</p>
+        ) : (
+          grouped.map(item =>
+            item.type === 'divider' ? (
+              <DateDivider key={`div-${item.label}`} label={item.label} />
+            ) : (
+              <ActivityRow key={item.data.id} activity={item.data} />
+            )
+          )
         )}
-
       </div>
     </div>
   )

@@ -1,177 +1,169 @@
-import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { useFetch } from '../../hook/useFetch'
-import { taskService } from '../../services/taskServices'
-import { userService } from '../../services/userService'
-import { getToken } from '../../utils/getToken'
-import { useStatus } from '../../hook/useStatus'
-import { toast } from 'sonner'
+import { useState, useEffect } from 'react'
+import { AdminTasksProvider, useAdminTasksContext } from '@/hook/useAdminTask'
 import AddTaskModal from '@/components/shared/admin/Tasks/AddTaskModal'
 import KanbanColumn from '@/components/shared/admin/Tasks/KanbanColumn'
-import TaskToolbar from '@/components/shared/admin/Tasks/TaskToolbar'
+import TaskToolbar  from '@/components/shared/admin/Tasks/TaskToolbar'
+import TaskListView from '@/components/shared/admin/Tasks/TaskListView'
+import TaskListViewSkeleton from '@/components/shared/admin/Tasks/TaskListViewSkeleton'
 
 const COLUMNS = [
-  { key: 'backlog',     label: 'Backlog',     dot: 'bg-tt-col-backlog-dot',  accentCls: 'text-tt-col-backlog-accent',  countCls: 'bg-tt-col-backlog-count',  bgCls: 'bg-tt-col-backlog-bg'  },
-  { key: 'in_progress', label: 'In Progress', dot: 'bg-tt-col-progress-dot', accentCls: 'text-tt-col-progress-accent', countCls: 'bg-tt-col-progress-count', bgCls: 'bg-tt-col-progress-bg' },
-  { key: 'done',        label: 'Done',        dot: 'bg-tt-col-done-dot',     accentCls: 'text-tt-col-done-accent',     countCls: 'bg-tt-col-done-count',     bgCls: 'bg-tt-col-done-bg'     },
+  { key: 'backlog',     label: 'BACKLOG',     borderCls: 'border-border-primary' },
+  { key: 'in_progress', label: 'IN PROGRESS', borderCls: 'border-border-primary' },
+  { key: 'done',        label: 'DONE',        borderCls: 'border-border-primary' },
 ]
 
-const EMPTY_ARRAY = []
+const ITEMS_PER_PAGE = 12
 
-export default function AdminTasks() {
-  const { loading, start, done } = useStatus()
-  const { data: tasks = EMPTY_ARRAY, fetch: fetchTasks } = useFetch(taskService.getAll)
-  const { data: users = EMPTY_ARRAY, fetch: fetchUsers } = useFetch(userService.getAll)
+function AdminTasksContent() {
+  const [view, setView] = useState('list')
+  const [page, setPage] = useState(1)
 
-  const [selectedUser,     setSelectedUser]     = useState({})
-  const [showModal,        setShowModal]        = useState(false)
-  const [modalForm,        setModalForm]        = useState({ title: '', description: '' })
-  const [search,           setSearch]           = useState('')
-  const [filterUser,       setFilterUser]       = useState('')
-  const [sortBy,           setSortBy]           = useState('')
-  const [expanded,         setExpanded]         = useState({})
-  const [addingTo,         setAddingTo]         = useState(null)
-  const [showMobileSearch, setShowMobileSearch] = useState(false)
-  const [activeTab,        setActiveTab]        = useState('backlog')
-  const mobileSearchRef = useRef(null)
+  const {
+    users, filteredTasks, loading,
+    showModal, modalForm, setModalForm,
+    handleModalSubmit, handleCloseModal,
+    hasFilters, expanded, toggleExpand,
+    selectedUser, handleSelectUser, handleAssign,
+    activeTab, fetchTasks,
+  } = useAdminTasksContext()
 
-  useEffect(() => { fetchTasks(); fetchUsers() }, [fetchTasks, fetchUsers])
+  const totalPages     = Math.ceil(filteredTasks.length / ITEMS_PER_PAGE)
+  const paginatedTasks = filteredTasks.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
+  const startItem      = filteredTasks.length === 0 ? 0 : (page - 1) * ITEMS_PER_PAGE + 1
+  const endItem        = Math.min(page * ITEMS_PER_PAGE, filteredTasks.length)
 
-  const handleModalSubmit = useCallback(async (e) => {
-    e.preventDefault()
-    if (!modalForm.title.trim()) {
-      toast.error('Please add a title.')
-    return
-    }
-    if (!modalForm.description.trim()) {
-      toast.error('Please add a description.')
-      return
-    }
-    try {
-      start()
-      const token = await getToken()
-      await taskService.create(token, { ...modalForm, status: 'backlog' })
-      setModalForm({ title: '', description: '' })
-      toast.success('Task created!')
-      fetchTasks()
-      setShowModal(false)
-    } catch (err) { toast.error(err.message) }
-    finally { done() }
-  }, [modalForm, start, done, fetchTasks])
-
-  const handleAssign = useCallback(async (taskId, userId) => {
-    try {
-      const token = await getToken()
-      const user  = users.find(u => u.uid === (userId || selectedUser[taskId]))
-      if (!user) return
-      await taskService.assign(token, taskId, { userId: user.uid, userEmail: user.email })
-      fetchTasks()
-    } catch (err) { console.error(err.message) }
-  }, [users, selectedUser, fetchTasks])
-
-  const handleSelectUser = useCallback(
-    (taskId, userId) => setSelectedUser(prev => ({ ...prev, [taskId]: userId })), []
-  )
-
-  const toggleExpand  = useCallback((key) => setExpanded(prev => ({ ...prev, [key]: !prev[key] })), [])
-  const clearFilters  = useCallback(() => { setSearch(''); setFilterUser(''); setSortBy('') }, [])
-  const hasFilters    = search || filterUser || sortBy
-
-  const filteredTasks = useMemo(() => tasks
-    .filter(task => {
-      const matchSearch = task.title.toLowerCase().includes(search.toLowerCase()) ||
-        task.description?.toLowerCase().includes(search.toLowerCase())
-      const matchUser =
-        filterUser === ''           ? true :
-        filterUser === 'unassigned' ? !task.assignedEmail :
-        task.assignedEmail === filterUser
-      return matchSearch && matchUser
-    })
-    .sort((a, b) => {
-      if (sortBy === 'title_asc')  return a.title.localeCompare(b.title)
-      if (sortBy === 'title_desc') return b.title.localeCompare(a.title)
-      if (sortBy === 'assigned')   return (a.assignedEmail || '').localeCompare(b.assignedEmail || '')
-      if (sortBy === 'unassigned') return a.assignedEmail ? 1 : -1
-      return 0
-    }),
-  [tasks, search, filterUser, sortBy])
-
+  useEffect(() => { setPage(1) }, [filteredTasks.length])
 
   return (
-    <div className='flex h-screen overflow-hidden'>
-      <div className='flex-1 min-w-0 flex flex-col overflow-hidden transition-all duration-300'>
+    <div className='flex h-screen overflow-hidden bg-bg-primary mt-5 rounded-2xl py-2 px-5'>
+      <div className='flex-1 min-w-0 flex flex-col overflow-hidden'>
 
         <AddTaskModal
-          show={showModal} loading={loading}
+          show={showModal}      loading={loading}
           modalForm={modalForm} onChange={setModalForm}
           onSubmit={handleModalSubmit}
-          onClose={() => { setShowModal(false); 
-          setModalForm({ title: '', description: '' }) }}
+          onClose={handleCloseModal}
         />
 
-        <div className='flex-1 overflow-hidden px-3 py-3 sm:px-6 sm:py-6'>
-          <div className='h-full flex flex-col rounded-2xl bg-tt-bg-card border border-tt-border overflow-hidden'>
+        <div className='flex-1 overflow-hidden'>
+          <div className='h-full flex flex-col overflow-hidden gap-3'>
 
-            <TaskToolbar
-              filteredCount={filteredTasks.length}
-              search={search} setSearch={setSearch}
-              sortBy={sortBy}           
-              setSortBy={setSortBy}
-              filterUser={filterUser}   
-              setFilterUser={setFilterUser}
-              showMobileSearch={showMobileSearch} 
-              setShowMobileSearch={setShowMobileSearch}
-              mobileSearchRef={mobileSearchRef}
-              hasFilters={hasFilters}   
-              clearFilters={clearFilters}
-              onAddTask={() => setShowModal(true)}
-              columns={COLUMNS}
-              filteredTasks={filteredTasks}
-              activeTab={activeTab}     
-              setActiveTab={setActiveTab}
-              users={users}
-            />
+            {/* Toolbar — ViewToggle is now inside TaskToolbar */}
+            <TaskToolbar view={view} setView={setView} />
 
-            {/* Mobile */}
-            <div className='md:hidden flex-1 overflow-y-auto'>
-              {COLUMNS.filter(col => col.key === activeTab).map((col, ci) => (
-                <KanbanColumn
-                  key={col.key} col={col} ci={ci} isMobile
-                  tasks={filteredTasks.filter(t => t.status === col.key)}
-                  users={users} 
-                  selectedUser={selectedUser}
-                  expanded={expanded} 
-                  hasFilters={hasFilters} 
-                  addingTo={addingTo}
-                  onSelectUser={handleSelectUser} 
-                  onAssign={handleAssign}
-                  onToggleExpand={toggleExpand}
-                  onRefetch={fetchTasks}
-                />
-              ))}
-            </div>
+            {/* LIST VIEW */}
+            {view === 'list' && (
+              <div className='flex-1 min-h-0 flex flex-col overflow-hidden rounded-2xl border border-border-primary bg-bg-primary'>
 
-            {/* Desktop */}
-            <div className='hidden md:grid md:grid-cols-3 flex-1 min-h-0'>
-              {COLUMNS.map((col, ci) => (
-                <KanbanColumn
-                  key={col.key} col={col} ci={ci}
-                  tasks={filteredTasks.filter(t => t.status === col.key)}
-                  users={users} 
-                  selectedUser={selectedUser}
-                  expanded={expanded} 
-                  hasFilters={hasFilters} 
-                  addingTo={addingTo}
-                  onSelectUser={handleSelectUser} 
-                  onAssign={handleAssign}
-                  onToggleExpand={toggleExpand}
-                  onRefetch={fetchTasks}
-                />
-              ))}
-            </div>
+                <div className='flex-1 overflow-y-auto'>
+                  {loading || (filteredTasks.length === 0 && !hasFilters)
+                    ? <TaskListViewSkeleton rows={12} />
+                    : <TaskListView
+                        tasks={paginatedTasks}
+                        users={users}
+                        selectedUser={selectedUser}
+                        onSelectUser={handleSelectUser}
+                        onAssign={handleAssign}
+                      />
+                  }
+                </div>
+
+                {/* Pagination */}
+                {!loading && totalPages > 1 && (
+                  <div className='flex items-center justify-between px-4 py-2.5 border-t border-border-primary flex-shrink-0'>
+                    <p className='text-xs text-text-gray'>
+                      {startItem}–{endItem} of {filteredTasks.length} tasks
+                    </p>
+                    <div className='flex items-center gap-1'>
+                      <button
+                        onClick={() => setPage(p => p - 1)}
+                        disabled={page === 1}
+                        className='w-7 h-7 rounded-lg flex items-center justify-center border border-border-primary text-text-gray hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed bg-transparent'
+                      >
+                        <svg width='12' height='12' viewBox='0 0 16 16' fill='none'>
+                          <path d='M10 3L5 8l5 5' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      </button>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                        <button
+                          key={n}
+                          onClick={() => setPage(n)}
+                          className={`w-7 h-7 rounded-lg text-xs font-medium border transition-colors ${
+                            page === n
+                              ? 'bg-button-primary text-white border-button-primary'
+                              : 'border-border-primary text-text-gray hover:opacity-80 bg-transparent'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={page === totalPages}
+                        className='w-7 h-7 rounded-lg flex items-center justify-center border border-border-primary text-text-gray hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed bg-transparent'
+                      >
+                        <svg width='12' height='12' viewBox='0 0 16 16' fill='none'>
+                          <path d='M6 3l5 5-5 5' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* BOARD VIEW */}
+            {view === 'board' && (
+              <>
+                <div className='hidden md:grid md:grid-cols-3 flex-1 min-h-0 gap-4'>
+                  {COLUMNS.map((col, ci) => (
+                    <div key={col.key} className={`rounded-2xl border overflow-hidden ${col.borderCls}`}>
+                      <KanbanColumn
+                        col={col} ci={ci}
+                        tasks={filteredTasks.filter(t => t.status === col.key)}
+                        users={users}           selectedUser={selectedUser}
+                        expanded={expanded}     hasFilters={hasFilters}
+                        onSelectUser={handleSelectUser}
+                        onAssign={handleAssign}
+                        onToggleExpand={toggleExpand}
+                        onRefetch={fetchTasks}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className='md:hidden flex-1 overflow-y-auto'>
+                  {COLUMNS.filter(col => col.key === activeTab).map((col, ci) => (
+                    <div key={col.key} className={`rounded-2xl border-2 overflow-hidden ${col.borderCls}`}>
+                      <KanbanColumn
+                        col={col} ci={ci} isMobile
+                        tasks={filteredTasks.filter(t => t.status === col.key)}
+                        users={users}           selectedUser={selectedUser}
+                        expanded={expanded}     hasFilters={hasFilters}
+                        onSelectUser={handleSelectUser}
+                        onAssign={handleAssign}
+                        onToggleExpand={toggleExpand}
+                        onRefetch={fetchTasks}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
 
           </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AdminTasks() {
+  return (
+    <AdminTasksProvider>
+      <AdminTasksContent />
+    </AdminTasksProvider>
   )
 }

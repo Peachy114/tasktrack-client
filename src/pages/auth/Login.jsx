@@ -42,39 +42,39 @@ export default function Login() {
   }
 
   return (
-    <div className='min-h-screen bg-tt-bg flex items-center justify-center p-6'>
+    <div className='min-h-screen bg-bg-page flex items-center justify-center p-6'>
       <div className='w-full max-w-md flex flex-col gap-6'>
 
         {/* Card */}
-        <div className='bg-tt-bg-card border border-tt-border rounded-3xl p-7 flex flex-col gap-4'>
+        <div className='bg-bg-primary border border-border-primary rounded-3xl p-7 flex flex-col gap-4'>
 
           {/* Header */}
           <div className='text-center mb-5'>
-            <div className='w-11 h-11 rounded-xl bg-tt-primary flex items-center justify-center mx-auto mb-4'>
+            <div className='w-11 h-11 rounded-xl bg-button-primary flex items-center justify-center mx-auto mb-4'>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <rect x="3" y="9" width="14" height="10" rx="2" stroke="#ffffff" strokeWidth="1.5"/>
                 <path d="M7 9V6a3 3 0 016 0v3" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
-            <p className='text-xs font-semibold tracking-widest uppercase text-tt-text-hint mb-1'>
+            <p className='text-xs font-semibold tracking-widest uppercase text-text-gray mb-1'>
               Welcome back
             </p>
-            <h1 className='text-2xl font-bold text-tt-primary'>
+            <h1 className='text-2xl font-bold text-text-blue'>
               Sign in to your account
             </h1>
-            <p className='text-sm text-tt-text-muted mt-1.5'>
+            <p className='text-sm text-text-gray mt-1.5'>
               Enter your credentials to continue
             </p>
-        </div>
+          </div>
 
           {/* Error */}
           {error && (
-            <div className='bg-tt-bg-muted border border-tt-border border-l-4 border-l-red-500 rounded-xl p-3 flex items-center gap-2'>
+            <div className='bg-bg-page border border-border-primary border-l-4 border-l-danger rounded-xl p-3 flex items-center gap-2'>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="#ef4444" strokeWidth="1.5"/>
-                <path d="M7 4v3M7 9.5v.5" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="7" cy="7" r="6" stroke="#FF4D4D" strokeWidth="1.5"/>
+                <path d="M7 4v3M7 9.5v.5" stroke="#FF4D4D" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              <p className='text-xs text-tt-text'>{error}</p>
+              <p className='text-xs text-text-primary'>{error}</p>
             </div>
           )}
 
@@ -82,33 +82,33 @@ export default function Login() {
 
             {/* Email */}
             <div className='flex flex-col gap-1.5'>
-              <label className='text-xs font-semibold text-tt-text'>Email address</label>
+              <label className='text-xs font-semibold text-text-primary'>Email address</label>
               <input
                 type="email" name="email" value={form.email}
                 onChange={handleChange} placeholder="you@example.com" required
-                className='w-full px-3.5 py-2.5 text-sm rounded-xl border border-tt-border bg-tt-bg-muted text-tt-text outline-none transition-colors focus:border-tt-primary'
+                className='w-full px-3.5 py-2.5 text-sm rounded-xl border border-border-primary bg-bg-page text-text-primary outline-none transition-colors focus:border-text-blue'
               />
             </div>
 
             {/* Password */}
             <div className='flex flex-col gap-1.5'>
               <div className='flex items-center justify-between'>
-                <label className='text-xs font-semibold text-tt-text'>Password</label>
-                <a href="/forgot-password" className='text-xs text-tt-primary font-medium no-underline hover:opacity-80'>
+                <label className='text-xs font-semibold text-text-primary'>Password</label>
+                <a href="/forgot-password" className='text-xs text-text-blue font-medium no-underline hover:opacity-80'>
                   Forgot password?
                 </a>
               </div>
               <input
                 type="password" name="password" value={form.password}
                 onChange={handleChange} placeholder="Enter your password" required
-                className='w-full px-3.5 py-2.5 text-sm rounded-xl border border-tt-border bg-tt-bg-muted text-tt-text outline-none transition-colors focus:border-tt-primary'
+                className='w-full px-3.5 py-2.5 text-sm rounded-xl border border-border-primary bg-bg-page text-text-primary outline-none transition-colors focus:border-text-blue'
               />
             </div>
 
             {/* Submit */}
             <button
               type="submit" disabled={loading}
-              className='w-full py-3 mt-1 text-sm font-bold rounded-xl border-none bg-tt-primary text-white hover:opacity-90 transition-opacity disabled:bg-tt-border disabled:text-tt-text-muted disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              className='w-full py-3 mt-1 text-sm font-bold rounded-xl border-none bg-button-primary text-text-secondary hover:opacity-90 transition-opacity disabled:bg-border-primary disabled:text-text-gray disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {loading ? (
                 <>
@@ -123,9 +123,9 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <p className='text-center text-xs text-tt-text-muted'>
+        <p className='text-center text-xs text-text-gray'>
           Don't have an account?{" "}
-          <a href="/signup" className='text-tt-primary font-semibold no-underline hover:opacity-80'>
+          <a href="/signup" className='text-text-blue font-semibold no-underline hover:opacity-80'>
             Sign up
           </a>
         </p>

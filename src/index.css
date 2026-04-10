@@ -3,169 +3,88 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@theme {
-  /* ── Primary ── */
-  --color-tt-white:                #ffffff;
-  --color-tt-primary:              #3282B8;
-  --color-tt-primary-light:        #BBE1FA;
-  --color-tt-primary-hover:        #0F4C75;
-  --color-tt-primary-muted:        #5fa8d3;
- 
-  /* ── Secondary ── */
-  --color-tt-secondary:            #0F4C75;
-  --color-tt-secondary-light:      #DDE6ED;
+/* :root {
+  color: #facbc3;
+} */
 
-  /* ── Dashboard Specifics ── */
-  --color-tt-indigo:               #3282B8;
-  --color-tt-indigo-light:         #BBE1FA;
-  --color-tt-purple:               #0F4C75;
-  --color-tt-purple-light:         #DDE6ED;
-  --color-tt-purple-muted:         #BBE1FA;
-  --color-tt-orange:               #EA580C;
-  --color-tt-orange-light:         #FFF7ED;
-  --color-tt-slate-muted:          #6a96b0;
-  --color-tt-slate-light:          #DDE6ED;
-  --color-tt-slate-bg:             #f0f5f8;
- 
-  /* ── Backgrounds ── */
-  --color-tt-bg:                   #DDE6ED;
-  --color-tt-bg-card:              #ffffff;
-  --color-tt-bg-muted:             #c8d8e4;
- 
-  /* ── Text ── */
-  --color-tt-text:                 #1B262C;
-  --color-tt-text-muted:           #3282B8;
-  --color-tt-text-hint:            #6a96b0;
- 
-  /* ── Borders ── */
-  --color-tt-border:               #b8cdd9;
-  --color-tt-border-hover:         #3282B8;
- 
-  /* ── Status: Backlog ── */
-  --color-tt-backlog-bg:           #DDE6ED;
-  --color-tt-backlog-text:         #1B262C;
-  --color-tt-col-backlog-bg:       #DDE6ED;
-  --color-tt-col-backlog-dot:      #6a96b0;
-  --color-tt-col-backlog-accent:   #1B262C;
-  --color-tt-col-backlog-count:    #c8d8e4;
- 
-  /* ── Status: In Progress ── */
-  --color-tt-progress-bg:          #BBE1FA;
-  --color-tt-progress-text:        #0F4C75;
-  --color-tt-col-progress-bg:      #daeef9;
-  --color-tt-col-progress-dot:     #3282B8;
-  --color-tt-col-progress-accent:  #3282B8;
-  --color-tt-col-progress-count:   #BBE1FA;
- 
-  /* ── Status: Done ── */
-  --color-tt-done-bg:              #E3FCEF;
-  --color-tt-done-text:            #006644;
-  --color-tt-col-done-bg:          #E3FCEF;
-  --color-tt-col-done-dot:         #006644;
-  --color-tt-col-done-accent:      #006644;
-  --color-tt-col-done-count:       #E3FCEF;
- 
-  /* ── Avatars ── */
-  --color-tt-av1-bg:               #BBE1FA;
-  --color-tt-av1-text:             #0F4C75;
-  --color-tt-av2-bg:               #E3FCEF;
-  --color-tt-av2-text:             #006644;
-  --color-tt-av3-bg:               #FFF0B3;
-  --color-tt-av3-text:             #FF8B00;
-  --color-tt-av4-bg:               #FFE2D9;
-  --color-tt-av4-text:             #BF2600;
-  --color-tt-av5-bg:               #DDE6ED;
-  --color-tt-av5-text:             #0F4C75;
+
+@theme {
+  /* background */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #2979FF;
+  --color-bg-page: #F5F6FA;
+  --color-bg-light-blue: #E8F0FE;
+  --color-bg-sidebar: #1A1A2E;
+  --color-bg-orange: #ff8a75;
+
+  /* text */
+  --color-text-primary: #2B2B2B;
+  --color-text-secondary: #ffffff;
+  --color-text-gray: #9B9B9B;
+  --color-text-blue: #2979FF;
+
+  /* status */
+  --color-danger: #FF4D4D;
+  --color-success: #00C48C;
+  --color-warning: #FFB800;
+
+  --color-total : #2979FF;
+  --color-completed : #00C48C;
+  --color-in_progress : #2979FF;
+  --color-pending : #9B9B9B;
+  --color-rate : #ff8a75;
+
+  /* buttons */
+  --color-button-primary: #2979FF;
+  --color-button-dark: #1565C0;
+
+  /* border */
+  --color-border-primary: #E0E0E0;
+  --color-border-secondary: #c5c5c5;
 }
- 
-/* ============================================================
-   CSS Variables
-   ============================================================ */
-:root {
-  --gradient-tt-bg: linear-gradient(135deg, #0F4C75 0%, #3282B8 50%, #BBE1FA 100%);
-  --tt-bg-overlay:   rgba(27, 38, 44, 0.54);
-  --tt-navbar-h:     48px;
-  --tt-shadow-sm:    0 1px 3px rgba(15,76,117,0.13), 0 0 0 1px rgba(15,76,117,0.08);
-  --tt-shadow-md:    0 4px 12px rgba(15,76,117,0.15), 0 0 0 1px rgba(15,76,117,0.08);
-  --tt-shadow-lg:    0 8px 24px rgba(15,76,117,0.18), 0 0 0 1px rgba(15,76,117,0.08);
-  --tt-shadow-card:  0 2px 16px rgba(27,38,44,0.07);
-} 
  
 /* ============================================================
    DARK MODE
    ============================================================ */
-.dark {
-  /* ── Primary ── */
-  --color-tt-primary:              #BBE1FA;
-  --color-tt-primary-light:        #0F4C75;
-  --color-tt-primary-hover:        #3282B8;
-  --color-tt-primary-muted:        #5fa8d3;
- 
-  /* ── Secondary ── */
-  --color-tt-secondary:            #3282B8;
-  --color-tt-secondary-light:      #0a2e47;
 
-  /* ── Dashboard Specifics Dark ── */
-  --color-tt-indigo:               #BBE1FA;
-  --color-tt-indigo-light:         #0a2233;
-  --color-tt-purple:               #5fa8d3;
-  --color-tt-purple-light:         #071a26;
-  --color-tt-slate-bg:             #0d1c26;
- 
-  /* ── Backgrounds ── */
-  --color-tt-bg:                   #0d1c26;
-  --color-tt-bg-card:              #122333;
-  --color-tt-bg-muted:             #162d3f;
- 
-  /* ── Text ── */
-  --color-tt-text:                 #DDE6ED;
-  --color-tt-text-muted:           #BBE1FA;
-  --color-tt-text-hint:            #6a96b0;
- 
-  /* ── Borders ── */
-  --color-tt-border:               #1e3a4f;
-  --color-tt-border-hover:         #3282B8;
- 
-  /* ── Status: Backlog ── */
-  --color-tt-backlog-bg:           #162d3f;
-  --color-tt-backlog-text:         #BBE1FA;
-  --color-tt-col-backlog-bg:       #0d1c26;
-  --color-tt-col-backlog-dot:      #3282B8;
-  --color-tt-col-backlog-accent:   #BBE1FA;
-  --color-tt-col-backlog-count:    #162d3f;
- 
-  /* ── Status: In Progress ── */
-  --color-tt-progress-bg:          #0a2e47;
-  --color-tt-progress-text:        #BBE1FA;
-  --color-tt-col-progress-bg:      #091e2e;
-  --color-tt-col-progress-dot:     #3282B8;
-  --color-tt-col-progress-accent:  #BBE1FA;
-  --color-tt-col-progress-count:   #0a2e47;
- 
-  /* ── Status: Done ── */
-  --color-tt-done-bg:              #0d2e1f;
-  --color-tt-done-text:            #4BCE97;
-  --color-tt-col-done-bg:          #0a2419;
-  --color-tt-col-done-dot:         #4BCE97;
-  --color-tt-col-done-accent:      #4BCE97;
-  --color-tt-col-done-count:       #0d2e1f;
- 
-  /* ── Avatars ── */
-  --color-tt-av1-bg:               #0a2e47;
-  --color-tt-av1-text:             #BBE1FA;
-  --color-tt-av2-bg:               #0d2e1f;
-  --color-tt-av2-text:             #4BCE97;
-  --color-tt-av3-bg:               #332D00;
-  --color-tt-av3-text:             #F5CD47;
-  --color-tt-av4-bg:               #3D1A14;
-  --color-tt-av4-text:             #F87462;
-  --color-tt-av5-bg:               #0F4C75;
-  --color-tt-av5-text:             #BBE1FA;
- 
-  /* ── Shadows ── */
-  --tt-shadow-sm:    0 1px 3px rgba(0,0,0,0.36), 0 0 0 1px rgba(255,255,255,0.04);
-  --tt-shadow-md:    0 4px 12px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.04);
-  --tt-shadow-lg:    0 8px 32px rgba(0,0,0,0.48), 0 0 0 1px rgba(255,255,255,0.06);
+.dark {
+  /* background */
+  --color-bg-primary:    #1C1C28;
+  --color-bg-secondary:  #2979FF;
+  --color-bg-page:       #13131E;
+  --color-bg-light-blue: #1a2744;
+  --color-bg-sidebar:    #13131E;
+  --color-bg-orange:     #ff8a75;
+
+  /* text */
+  --color-text-primary:   #E2E2EE;
+  --color-text-secondary: #ffffff;
+  --color-text-gray: #8B8BA8;
+  --color-text-blue:      #5B9BFF;
+
+  /* status */
+  --color-danger:  #FF6B6B;
+  --color-success: #00D9A0;
+  --color-warning: #FFC933;
+
+  --color-total:       #5B9BFF;
+  --color-completed:   #00D9A0;
+  --color-in_progress: #5B9BFF;
+  --color-pending:     #5A5A72;
+  --color-rate:        #ff9e8e;
+
+  /* buttons */
+  --color-button-primary: #2979FF;
+  --color-button-dark:    #1565C0;
+
+  /* border */
+  --color-border-primary:   #25253A;
+  --color-border-secondary: #2E2E45;
+}
+
+/* Input */
+input::placeholder {
+  color: var(--color-text-gray);
 }
 
 /* ── Scrollbar ── */
@@ -176,4 +95,37 @@
 
 *::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Select ── */
+select {
+  outline: none;
+}
+
+.dark select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #2b2b2b;
+}
+
+select:focus {
+  color: #2b2b2b;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* charts */
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+.recharts-rectangle:focus,
+.recharts-rectangle:focus-visible {
+  outline: none !important;
 }
