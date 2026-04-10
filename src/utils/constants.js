@@ -8,6 +8,7 @@ export const AV_COLORS = [
   'bg-tt-av5-bg text-tt-av5-text',
 ]
 
+// ── Chart Constants ───────────────────────────────────────────────────────────
 export const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 export const C = {
@@ -18,8 +19,8 @@ export const C = {
   orange:      '#f97316',
   red:         '#e24b4a',
   green:       '#639922',
-  grid:        'rgba(255,255,255,0.05)',
-  tick:        '#4b5673',
+  grid: 'rgba(0,0,0,0.06)',
+  tick: '#9B9B9B', 
 }
 
 export const chartDefaults = {
@@ -27,7 +28,34 @@ export const chartDefaults = {
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { grid: { color: C.grid }, ticks: { color: C.tick, font: { size: 10 } } },
-    y: { grid: { color: C.grid }, ticks: { color: C.tick, font: { size: 10 } } },
+    x: {
+      grid: { display: false },                          // ← remove vertical grid lines like the reference
+      ticks: { color: C.tick, font: { size: 10 } },
+      border: { display: false },
+    },
+    y: {
+      grid: { color: C.grid, drawBorder: false },
+      ticks: { color: C.tick, font: { size: 10 } },
+      border: { display: false },
+    },
   },
+}
+
+
+//Activity.jsx + TeamModal.jsx
+export const STATUS_LABEL = {
+  in_progress: 'In Progress',
+  done:        'Done',
+  backlog:     'Pending',
+}
+
+export const STATUS_BADGE = {
+  in_progress: 'bg-tt-progress-bg text-tt-progress-text',
+  done:        'bg-tt-done-bg text-tt-done-text',
+  backlog:     'bg-tt-backlog-bg text-tt-backlog-text',
+}
+
+export const TYPE_META = {
+  task_created:   { badgeCls: 'bg-tt-indigo-light text-tt-indigo',  label: 'Created' },
+  status_changed: { badgeCls: 'bg-tt-orange-light text-tt-orange',  label: 'Status'  },
 }

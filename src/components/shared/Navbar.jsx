@@ -1,134 +1,153 @@
+import React, { useState } from 'react'
+import UserCard from './Card/userCard'
 import { useAuth } from '@/context/AuthContext'
-import { useEffect, useState, useRef } from 'react'
-import { useLogout } from '@/hook/useLogout'
+import { TaskFlowIcon } from '../ui/Icons'
+import { useDarkMode } from '@/hook/useDarkMood'
+import { NavLink } from 'react-router-dom'
 
 export default function Navbar() {
-  const { currentUser } = useAuth();
-  const logout = useLogout();
-  const [dark, setDark] = useState(() => localStorage.getItem('tt-theme') === 'dark');
-  const [visible, setVisible] = useState(true);
-  const lastScrollY = useRef(0);
-  const [timeStr, setTimeStr] = useState('');
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-    localStorage.setItem('tt-theme', dark ? 'dark' : 'light')
-  }, [dark])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY
-      if (currentY < 10) {
-        setVisible(true)
-      } else if (currentY < lastScrollY.current) {
-        setVisible(true)
-      } else {
-        setVisible(false)
-      }
-      lastScrollY.current = currentY
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const update = () => {
-      const now = new Date()
-      const date = now.toLocaleDateString([], { month: 'short', day: 'numeric' })
-      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })
-      setTimeStr(`${date} · ${time}`)
-    }
-    update()
-    const interval = setInterval(update, 60000)
-    return () => clearInterval(interval)
-  }, [])
+  const { currentUser, logOut } = useAuth()
+  const username = currentUser?.email?.split('@')[0]
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const { dark, toggle } = useDarkMode()
 
   return (
-    <nav className={`h-[var(--tt-navbar-h)] bg-tt-bg-card border-b border-tt-border shadow-[var(--tt-shadow-sm)]
-      px-3 sm:px-4 flex items-center justify-between sticky top-0 z-50
-      transition-transform duration-300 ease-in-out
-      ${visible ? 'translate-y-0' : '-translate-y-full'}`}
-    >
-      {/* Left: Logo */}
-      <div className='flex items-center gap-2 flex-shrink-0'>
-        <div className='w-7 h-7 rounded-lg bg-tt-primary flex items-center justify-center flex-shrink-0'>
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <rect x="2" y="2" width="5" height="5" rx="1.5" fill="white"/>
-            <rect x="9" y="2" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
-            <rect x="2" y="9" width="5" height="5" rx="1.5" fill="white" opacity="0.6"/>
-            <rect x="9" y="9" width="5" height="5" rx="1.5" fill="white"/>
-          </svg>
+    <nav className='relative border-b border-border-primary bg-bg-primary'>
+
+      {/* Top gradient line */}
+      <div
+        className='absolute top-0 left-0 right-0 h-[2px] pointer-events-none'
+        style={{ background: 'linear-gradient(90deg, #2979FF, #00C48C, #2979FF)' }}
+      />
+
+      <div className='flex justify-between items-center py-2 px-5'>
+
+        {/* Logo */}
+        <NavLink to="/admin" className='flex items-center gap-3'>
+          <TaskFlowIcon />
+          <span className='text-lg font-bold text-text-primary'>TaskFlow</span>
+          <div className='hidden sm:block h-4 w-px bg-border-primary' />
+          <h1 className='hidden sm:flex text-sm items-center gap-1 text-text-primary'>
+            Hello,{' '}
+            <span className='font-semibold text-text-blue'>{username}</span>
+          </h1>
+        </NavLink>
+
+        {/* Desktop right */}
+        <div className='hidden sm:flex items-center gap-2 relative z-10 overflow-visible'>
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggle}
+            className='w-8 h-8 flex items-center justify-center rounded-xl border border-border-primary hover:bg-bg-page transition-colors'
+          >
+            {dark ? (
+              <svg width='15' height='15' viewBox='0 0 24 24' fill='none'
+                stroke='var(--color-text-primary)'
+                strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                <circle cx='12' cy='12' r='5'/>
+                <line x1='12' y1='1' x2='12' y2='3'/>
+                <line x1='12' y1='21' x2='12' y2='23'/>
+                <line x1='4.22' y1='4.22' x2='5.64' y2='5.64'/>
+                <line x1='18.36' y1='18.36' x2='19.78' y2='19.78'/>
+                <line x1='1' y1='12' x2='3' y2='12'/>
+                <line x1='21' y1='12' x2='23' y2='12'/>
+                <line x1='4.22' y1='19.78' x2='5.64' y2='18.36'/>
+                <line x1='18.36' y1='5.64' x2='19.78' y2='4.22'/>
+              </svg>
+            ) : (
+              <svg width='15' height='15' viewBox='0 0 24 24' fill='none'
+                stroke='var(--color-text-primary)'
+                strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                <path d='M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'/>
+              </svg>
+            )}
+          </button>
+
+          <UserCard />
         </div>
-        <span className='text-sm font-bold text-tt-primary hidden xs:block sm:block'>TaskTrack</span>
-      </div>
 
-      {/* Right */}
-      <div className='flex items-center gap-1.5 sm:gap-2 min-w-0'>
-
-        {/* Time — hidden on mobile */}
-        <span className='text-xs font-medium text-tt-text-muted hidden md:block'>
-          {timeStr}
-        </span>
-
-        {/* Dark mode toggle */}
+        {/* Mobile hamburger */}
         <button
-          onClick={() => setDark(v => !v)}
-          className='w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0
-            hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
-          title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className='sm:hidden w-8 h-8 flex flex-col items-center justify-center gap-1.5 rounded-lg hover:bg-bg-page transition-colors'
+          onClick={() => setMobileOpen(o => !o)}
         >
-          {dark ? (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/>
-              <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          ) : (
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-              <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"
-                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          )}
+          <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-200 ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
+          <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-200 ${mobileOpen ? 'opacity-0' : ''}`} />
+          <span className={`block w-5 h-0.5 bg-text-primary transition-all duration-200 ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
         </button>
 
-        <div className='w-px h-5 bg-tt-border flex-shrink-0' />
+      </div>
 
-        {/* User Info */}
-        <div className='flex items-center gap-1.5 px-2 py-1 rounded-full bg-tt-bg-muted border border-tt-border min-w-0'>
-          <div className='w-5 h-5 rounded-full bg-tt-primary flex items-center justify-center
-            text-white font-bold flex-shrink-0 text-[10px]'>
-            {currentUser?.email?.[0].toUpperCase()}
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className='sm:hidden border-t border-border-primary bg-bg-primary px-5 py-4 flex flex-col gap-4'>
+
+          {/* User info */}
+          <div className='flex items-center gap-3'>
+            <div className='relative flex-shrink-0'>
+              <img
+                src='https://i.pravatar.cc/150?img=1'
+                alt='avatar'
+                className='w-10 h-10 rounded-full object-cover ring-2 ring-border-primary'
+              />
+              <span className='absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-success border-2 border-bg-primary' />
+            </div>
+            <div className='flex-1 min-w-0'>
+              <p className='text-sm font-semibold text-text-primary truncate'>{currentUser?.email}</p>
+              <p className='text-xs text-text-gray capitalize'>{currentUser?.role}</p>
+            </div>
+
+            {/* Dark mode toggle in mobile */}
+            <button
+              onClick={toggle}
+              className='w-8 h-8 flex items-center justify-center rounded-xl border border-border-primary hover:bg-bg-page transition-colors flex-shrink-0'
+            >
+              {dark ? (
+                <svg width='15' height='15' viewBox='0 0 24 24' fill='none'
+                  stroke='var(--color-text-primary)'
+                  strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                  <circle cx='12' cy='12' r='5'/>
+                  <line x1='12' y1='1' x2='12' y2='3'/>
+                  <line x1='12' y1='21' x2='12' y2='23'/>
+                  <line x1='4.22' y1='4.22' x2='5.64' y2='5.64'/>
+                  <line x1='18.36' y1='18.36' x2='19.78' y2='19.78'/>
+                  <line x1='1' y1='12' x2='3' y2='12'/>
+                  <line x1='21' y1='12' x2='23' y2='12'/>
+                  <line x1='4.22' y1='19.78' x2='5.64' y2='18.36'/>
+                  <line x1='18.36' y1='5.64' x2='19.78' y2='4.22'/>
+                </svg>
+              ) : (
+                <svg width='15' height='15' viewBox='0 0 24 24' fill='none'
+                  stroke='var(--color-text-primary)'
+                  strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                  <path d='M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'/>
+                </svg>
+              )}
+            </button>
           </div>
-          {/* Email + role hidden on small screens */}
-          <span className='text-xs font-semibold text-tt-text hidden sm:block truncate max-w-[80px]'>
-            {currentUser?.email?.split('@')[0]}
-          </span>
-          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium hidden sm:block flex-shrink-0 ${
-            currentUser?.role === 'admin'
-              ? 'bg-tt-primary-light text-tt-primary'
-              : 'bg-tt-progress-bg text-tt-progress-text'
-          }`}>
-            {currentUser?.role}
-          </span>
+
+          {/* Sign out */}
+          <button
+            onClick={logOut}
+            className='w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors'
+            style={{
+              border: '1px solid rgba(255,77,77,0.3)',
+              background: 'rgba(255,77,77,0.08)',
+              color: '#FF6B6B',
+            }}
+          >
+            <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+              <path d='M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4'/>
+              <polyline points='16 17 21 12 16 7'/>
+              <line x1='21' y1='12' x2='9' y2='12'/>
+            </svg>
+            Sign out
+          </button>
+
         </div>
+      )}
 
-        <div className='w-px h-5 bg-tt-border flex-shrink-0' />
-
-        {/* Sign out — icon only on mobile, icon+text on sm+ */}
-        <button
-          onClick={logout}
-          className='flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1.5 rounded-full flex-shrink-0
-            hover:opacity-80 transition-opacity bg-transparent border border-tt-border text-tt-text-muted'
-          title='Sign out'
-        >
-          <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
-            <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6"
-              stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className='hidden sm:inline'>Sign out</span>
-        </button>
-
-      </div>
     </nav>
   )
 }

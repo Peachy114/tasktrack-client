@@ -23,6 +23,16 @@ export const taskService = {
         return res.json();
     },
 
+    // PUT /tasks/:taskId/unassign
+    unassign: async (token, taskId) => {
+        const res = await fetch(`${API}/tasks/${taskId}/unassign`, {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to unassign task.');
+        return res.json();
+    },
+
     //POST /tasks
     create: async(token, data) => {
         const res = await fetch(`${API}/tasks`, {
@@ -103,7 +113,5 @@ export const taskService = {
         if (!res.ok) throw new Error('Failed to edit task')
         return res.json()
     },
-        
-
 
 }

@@ -4,7 +4,7 @@ import { collection, onSnapshot } from 'firebase/firestore'
 import { getToken } from '@/utils/getToken'
 import { POLL_INTERVAL } from '../utils/constants'
 
-//The manager — decides when to fetch and what to do with it
+//The admin — decides when to fetch and what to do with it
 export function useFirestoreTasks() {
   const [tasks, setTasks] = useState([])
   useEffect(() => {
@@ -22,7 +22,7 @@ export function useFirestoreTasks() {
 }
 
 
-
+//The manager — decides when to fetch and what to do with it
 export function useFirestoreUsers() {
   const [users, setUsers] = useState([])
   useEffect(() => {
@@ -35,7 +35,7 @@ export function useFirestoreUsers() {
 }
 
 
-
+//A reusable hook for polling any data with a fetcher function and interval
 export function usePolledData(fetcher, interval = POLL_INTERVAL) {
   const [data, setData] = useState([])
   const timerRef = useRef(null)
